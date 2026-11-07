@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireNutritionist } from "@/lib/auth";
-import { PLANS, fmtDate, fmtTime, rs, type Meal } from "@/lib/constants";
+import { PLANS, fmtDate, fmtTime, rs, type Meal, goalName } from "@/lib/constants";
 import { photoUrls } from "@/lib/photos";
 import { Avatar, Empty, FoodTile, LineChart, Pill, Row, Stat, TopBar } from "@/components/ui";
 import { Body } from "@/components/Shell";
@@ -56,7 +56,7 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
       <form action={updateClient.bind(null, id)} className="card">
         <h2 className="h3">About</h2>
         <label className="text-xs text-muted">Program<input name="program" defaultValue={link.program ?? ""} className="input" /></label>
-        <label className="text-xs text-muted">Goal<input name="goal" defaultValue={link.goal ?? ""} className="input" /></label>
+        <label className="text-xs text-muted">Goal<input name="goal" defaultValue={link.goal ? goalName(link.goal) : ""} className="input" /></label>
         <div className="grid grid-cols-3 gap-2">
           <label className="text-xs text-muted">Height (cm)<input name="height" defaultValue={link.height_cm ?? ""} inputMode="decimal" className="input" /></label>
           <label className="text-xs text-muted">Start (kg)<input name="weight" defaultValue={link.start_weight ?? ""} inputMode="decimal" className="input" /></label>

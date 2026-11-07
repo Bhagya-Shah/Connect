@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireNutritionist } from "@/lib/auth";
-import { PLANS } from "@/lib/constants";
+import { PLANS, goalName } from "@/lib/constants";
 import { Avatar, Empty, Pill, TopBar } from "@/components/ui";
 import { Body } from "@/components/Shell";
 import { InviteForm } from "./InviteForm";
@@ -34,7 +34,7 @@ export default async function ClientsPage() {
             {active.map((l) => (
               <Link key={l.id} href={`/pro/clients/${l.client_id}`} className="flex items-center gap-2.5 border-t border-line pt-2.5 first:border-0 first:pt-0">
                 <Avatar name={l.profiles?.full_name} />
-                <span className="min-w-0 flex-1"><b>{l.profiles?.full_name || "Client"}</b><br /><span className="text-sm text-muted">{l.goal || l.program || "No goal set"}</span>{l.source === "search" && <span className="text-xs text-muted"> · from search</span>}</span>
+                <span className="min-w-0 flex-1"><b>{l.profiles?.full_name || "Client"}</b><br /><span className="text-sm text-muted">{(l.goal && goalName(l.goal)) || l.program || "No goal set"}</span>{l.source === "search" && <span className="text-xs text-muted"> · from search</span>}</span>
                 {status(l.client_id)}
               </Link>
             ))}
