@@ -12,7 +12,7 @@ export default async function Account({ searchParams }: { searchParams: Promise<
   const [{ data: bookings }, { data: links }, { data: pays }] = await Promise.all([
     supabase.from("bookings").select("*, n:nutritionist_id(handle, profiles(full_name))").eq("client_id", user.id).neq("status", "cancelled").order("starts_at", { ascending: false }).limit(20),
     supabase.from("client_links").select("nutritionist_id, program, n:nutritionist_id(handle, profiles(full_name))").eq("client_id", user.id).eq("status", "active"),
-    supabase.from("payments").select("amount, created_at, booking_id").eq("client_id", user.id).eq("status", "paid").order("created_at", { ascending: false }),
+    supabase.from("payments").select("id, amount, created_at, booking_id").eq("client_id", user.id).eq("status", "paid").order("created_at", { ascending: false }),
   ]);
   type N = { handle: string; profiles: { full_name: string } };
   const now = Date.now();
@@ -47,7 +47,7 @@ export default async function Account({ searchParams }: { searchParams: Promise<
         {!!past.length && <section className="card"><h2 className="h3">Past sessions</h2>{past.map((b) => <Row key={b.id} label={fmtDate(b.starts_at)}>{b.service_name}</Row>)}</section>}
         <section className="card">
           <h2 className="h3">Payments</h2>
-          {pays?.length ? pays.map((p, i) => <Row key={i} label={fmtDate(p.created_at)}>{rs(p.amount)}</Row>) : <p className="text-sm text-muted">No payments yet.</p>}
+          {pays?.length ? pays.map((p) => <Row key={p.id} label={fmtDate(p.created_at)}>{rs(p.amount)} · <Link href={`/invoice/${p.id}`} className="font-semibold text-accent">Invoice</Link></Row>) : <p className="text-sm text-muted">No payments yet.</p>}
         </section>
         <LogoutButton />
       </Body>

@@ -148,7 +148,9 @@ export async function addService(_: Result, form: FormData): Promise<Result> {
   if (!name || isNaN(price)) return { error: "Add a name and a price." };
   if ((type === "package" || type === "monthly") && !PLANS[n.plan as PlanId].packages) return { error: "Packages and monthly plans need the Growth plan." };
   if (type === "group" && !PLANS[n.plan as PlanId].groups) return { error: "Group classes need the Pro plan." };
-  const { error } = await supabase.from("services").insert({ nutritionist_id: uid, name, type, price, details: String(form.get("details") || "").trim() || null });
+  const seats = parseInt(String(form.get("capacity") || "10"));
+  const { error } = await supabase.from("services").insert({ nutritionist_id: uid, name, type, price, details: String(form.get("details") || "").trim() || null,
+    capacity: type === "group" ? Math.min(100, Math.max(2, isNaN(seats) ? 10 : seats)) : null });
   if (error) return { error: error.message };
   revalidatePath("/pro/business");
   return { ok: true };
@@ -184,4 +186,49 @@ export async function switchPlanTest(plan: PlanId) {
   if (paymentsLive()) throw new Error("Use the real checkout");
   await createAdminClient().from("nutritionists").update({ plan, plan_renews_at: new Date(Date.now() + 30 * 864e5).toISOString() }).eq("id", uid);
   revalidatePath("/pro", "layout");
+}
+
+export async function saveInvoiceSettings(_: Result, form: FormData): Promise<Result> {
+  const { supabase, uid, n } = await me();
+  if (!PLANS[n.plan as PlanId].invoices) return { error: "GST invoices come with the Growth plan." };
+  const gstin = String(form.get("gstin") || "").trim().toUpperCase() || null;
+  if (gstin && !/^[0-9]{2}[A-Z0-9]{13}$/.test(gstin)) return { error: "A GSTIN has 15 characters, starting with 2 digits." };
+  const rate = parseInt(String(form.get("gst_rate") || "0"));
+  const { error } = await supabase.from("nutritionists").update({
+    business_name: String(form.get("business_name") || "").trim() || null, gstin,
+    business_address: String(form.get("business_address") || "").trim() || null,
+    gst_rate: [0, 5, 18].includes(rate) ? rate : 0,
+  }).eq("id", uid);
+  if (error) return { error: error.message };
+  revalidatePath("/pro/business");
+  return { ok: true };
+}
+
+/* ---------- Group sessions (Pro and Clinic) ---------- */
+export async function scheduleGroup(_: Result, form: FormData): Promise<Result> {
+  const { supabase, uid, n } = await me();
+  if (!PLANS[n.plan as PlanId].groups) return { error: "Group sessions need the Pro plan." };
+  const { data: s } = await supabase.from("services").select("*").eq("id", String(form.get("service"))).eq("nutritionist_id", uid).eq("type", "group").single();
+  if (!s) return { error: "Pick a group service. Add one in Business first." };
+  const date = String(form.get("date") || ""), time = String(form.get("time") || "");
+  const mins = Math.min(240, Math.max(15, parseInt(String(form.get("minutes") || "60")) || 60));
+  const seats = Math.min(100, Math.max(2, parseInt(String(form.get("capacity") || s.capacity || 10)) || 10));
+  const starts = new Date(`${date}T${time}:00+05:30`);
+  if (isNaN(starts.getTime())) return { error: "Pick a date and time." };
+  if (starts.getTime() < Date.now()) return { error: "Pick a time in the future." };
+  const ends = new Date(starts.getTime() + mins * 60_000);
+  const { data: clash } = await supabase.rpc("busy_slots", { n: uid, from_ts: starts.toISOString(), to_ts: ends.toISOString() });
+  if (clash?.length) return { error: "You already have a session at that time." };
+  const { error } = await supabase.from("group_sessions").insert({ nutritionist_id: uid, service_id: s.id, title: String(form.get("title") || "").trim() || s.name,
+    starts_at: starts.toISOString(), ends_at: ends.toISOString(), capacity: seats });
+  if (error) return { error: error.message };
+  revalidatePath("/pro/groups");
+  return { ok: true };
+}
+
+export async function cancelGroup(id: string) {
+  const { supabase, uid } = await me();
+  await supabase.from("group_sessions").update({ cancelled: true }).eq("id", id).eq("nutritionist_id", uid);
+  await supabase.from("bookings").update({ status: "cancelled" }).eq("group_session_id", id).eq("nutritionist_id", uid);
+  revalidatePath("/pro/groups");
 }

@@ -128,23 +128,23 @@ export type ServiceType = keyof typeof SERVICE_TYPES;
 export type PlanId = "starter" | "growth" | "pro" | "clinic";
 export const PLANS: Record<PlanId, {
   name: string; price: number; clients: number | null; fee: number; templates: boolean; chat: boolean;
-  grid: boolean; packages: boolean; groups: boolean; featured: boolean; team: number; blurb: string; features: string[]; tools: boolean;
+  grid: boolean; packages: boolean; groups: boolean; featured: boolean; team: number; blurb: string; features: string[]; tools: boolean; invoices: boolean; reports: boolean;
 }> = {
-  starter: { name: "Starter", price: 0, clients: 5, fee: 0.05, templates: false, chat: false, grid: false, packages: false, groups: false, featured: false, team: 1, tools: false,
+  starter: { name: "Starter", price: 0, clients: 5, fee: 0.05, templates: false, chat: false, grid: false, packages: false, groups: false, featured: false, team: 1, tools: false, invoices: false, reports: false,
     blurb: "For trying Connect", features: ["Up to 5 active clients", "Profile, booking link and calendar", "UPI and card payments (5% fee)", "Daily meal photos with basic review", "One simple diet plan per client", "Weight tracking"] },
-  growth: { name: "Growth", price: 499, clients: 30, fee: 0, templates: true, chat: true, grid: true, packages: true, groups: false, featured: false, team: 1, tools: true,
+  growth: { name: "Growth", price: 499, clients: 30, fee: 0, templates: true, chat: true, grid: true, packages: true, groups: false, featured: false, team: 1, tools: true, invoices: true, reports: false,
     blurb: "For most nutritionists", features: ["Up to 30 active clients", "0% payment fee, GST invoices", "Full photo feed with quick replies", "Weekly photo grid, missing-photo list", "Diet plan templates", "Progress and weekly check-ins", "Chat with clients", "Packages and monthly plans"] },
-  pro: { name: "Pro", price: 999, clients: null, fee: 0, templates: true, chat: true, grid: true, packages: true, groups: true, featured: true, team: 1, tools: true,
-    blurb: "For busy practices", features: ["Unlimited clients", "Everything in Growth", "Group classes", "Featured higher in search", "Full earnings reports"] },
-  clinic: { name: "Clinic", price: 2499, clients: null, fee: 0, templates: true, chat: true, grid: true, packages: true, groups: true, featured: true, team: 5, tools: true,
-    blurb: "For clinics and teams", features: ["Everything in Pro", "Up to 5 team members", "Your own logo and web address", "Priority support"] },
+  pro: { name: "Pro", price: 999, clients: null, fee: 0, templates: true, chat: true, grid: true, packages: true, groups: true, featured: true, team: 1, tools: true, invoices: true, reports: true,
+    blurb: "For busy practices", features: ["Unlimited clients", "Everything in Growth", "Group classes with seats and a shared video room", "Featured higher in search", "Earnings reports and CSV download"] },
+  clinic: { name: "Clinic", price: 2499, clients: null, fee: 0, templates: true, chat: true, grid: true, packages: true, groups: true, featured: true, team: 5, tools: true, invoices: true, reports: true,
+    blurb: "For clinics and teams", features: ["Everything in Pro", "Up to 5 team members", "Team dashboard: clients and earnings per member", "Clinic page with your logo and colours", "Your own web address (set up with support)", "Priority support"] },
 };
 /** Same prices for every specialist; what each plan includes is described per field. */
 export const PSY_PLAN_TEXT: Record<PlanId, { blurb: string; features: string[] }> = {
   starter: { blurb: "For trying Connect", features: ["Up to 5 active clients", "Profile, booking link and calendar", "Video sessions inside the app", "UPI and card payments (5% fee)", "Private session notes", "Daily mood check-ins and low-mood alerts", "Consent form before the first session"] },
   growth: { blurb: "For most therapists", features: ["Up to 30 active clients", "0% payment fee, GST invoices", "PHQ-9 and GAD-7 check-ups with score charts", "Risk alerts from check-ups", "Homework and exercise library", "Client journal (when they share it)", "Chat with clients", "Session packages"] },
-  pro: { blurb: "For full caseloads", features: ["Unlimited clients", "Everything in Growth", "Support groups and group sessions", "Featured higher in search", "Full earnings reports"] },
-  clinic: { blurb: "For clinics and teams", features: ["Everything in Pro", "Up to 5 therapists", "Your own logo and web address", "Priority support"] },
+  pro: { blurb: "For full caseloads", features: ["Unlimited clients", "Everything in Growth", "Support groups with seats and a shared video room", "Featured higher in search", "Earnings reports and CSV download"] },
+  clinic: { blurb: "For clinics and teams", features: ["Everything in Pro", "Up to 5 therapists", "Team dashboard: clients and earnings per member", "Clinic page with your logo and colours", "Your own web address (set up with support)", "Priority support"] },
 };
 export const planText = (p: PlanId, specialty?: string | null) => specialty === "psychology" ? PSY_PLAN_TEXT[p] : PLANS[p];
 

@@ -18,6 +18,8 @@ export default async function NutritionistPage({ params }: { params: Promise<{ h
   const { data: n } = await supabase.from("nutritionists").select("*, profiles(full_name)").eq("handle", handle).single();
   if (!n) notFound();
   const { data: services } = await supabase.from("services").select("*").eq("nutritionist_id", n.id).eq("active", true).order("price");
+  const { data: cm } = await supabase.from("clinic_members").select("clinics(name, slug, logo_url, brand_color)").eq("nutritionist_id", n.id).maybeSingle();
+  const clinic = cm?.clinics as unknown as { name: string; slug: string; logo_url: string | null; brand_color: string } | null;
   const psy = n.specialty === "psychology";
   const name = n.profiles?.full_name ?? (psy ? "Therapist" : "Nutritionist");
   return (
@@ -29,6 +31,13 @@ export default async function NutritionistPage({ params }: { params: Promise<{ h
           <Avatar name={name} size={60} />
           <div className="min-w-0 flex-1"><b>{n.qualification || (psy ? "Psychologist" : "Nutritionist")}{n.experience_years ? ` · ${n.experience_years} years` : ""}</b><br /><span className="text-sm text-muted">{[n.city, n.mode].filter(Boolean).join(" · ")}</span></div>
         </div>
+        {clinic && (
+          <Link href={`/c/${clinic.slug}`} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white" style={{ background: clinic.brand_color }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {clinic.logo_url && <img src={clinic.logo_url} alt="" className="h-6 w-6 rounded-md bg-white object-contain" />}
+            <span className="flex-1">Part of <b>{clinic.name}</b></span><span aria-hidden="true">›</span>
+          </Link>
+        )}
         {n.about && <p>{n.about}</p>}
         {!!n.goals.length && <div className="flex flex-wrap gap-1.5">{n.goals.map((g: string) => <Pill key={g}>{goalName(g)}</Pill>)}</div>}
         <section className="card">
@@ -39,7 +48,7 @@ export default async function NutritionistPage({ params }: { params: Promise<{ h
         {psy && <p className="rounded-xl bg-surface-2 p-3 text-sm text-muted">Sessions are private video calls inside Connect. What you share stays between you and {name.split(" ")[0] === "Dr." ? name : name.split(" ")[0]}.</p>}
         <h2 className="h3">Choose a service</h2>
         {services?.length ? services.map((s) => (
-          <Link key={s.id} href={`/n/${handle}/book?service=${s.id}`} className="card">
+          <Link key={s.id} href={s.type === "group" ? `/n/${handle}/group?service=${s.id}` : `/n/${handle}/book?service=${s.id}`} className="card">
             <div className="flex items-center gap-2"><b className="flex-1">{s.name}</b><span className="font-display font-semibold tabular-nums">{s.price ? rs(s.price) : "Free"}</span></div>
             <div className="flex items-center gap-2"><Pill>{SERVICE_TYPES[s.type as keyof typeof SERVICE_TYPES]}</Pill><span className="text-sm text-muted">{s.details}</span></div>
           </Link>

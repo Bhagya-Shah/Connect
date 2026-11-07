@@ -10,7 +10,7 @@ const ROLES: [Role, string, string][] = [
 ];
 
 export default function Onboarding({ next, initial }: { next?: string; initial?: Role }) {
-  const [role, setRole] = useState<Role | null>(initial ?? (next ? "client" : null));
+  const [role, setRole] = useState<Role | null>(initial ?? (next && !next.startsWith("/join-clinic/") ? "client" : null));
   const [nState, nAction, nBusy] = useActionState(startAsNutritionist, undefined);
   const [cState, cAction, cBusy] = useActionState(startAsClient, undefined);
 
@@ -40,6 +40,7 @@ export default function Onboarding({ next, initial }: { next?: string; initial?:
       {(role === "nutritionist" || role === "psychology") && (
         <form action={nAction} className="card" key={role}>
           <input type="hidden" name="specialty" value={role === "psychology" ? "psychology" : "nutrition"} />
+          <input type="hidden" name="next" value={next?.startsWith("/join-clinic/") ? next : ""} />
           <label htmlFor="nname" className="font-semibold">Your name as clients see it</label>
           <input id="nname" name="name" className="input" required placeholder={role === "psychology" ? "e.g. Dr. Aarti Kapoor" : "e.g. Priya Mehta"} />
           <label htmlFor="city" className="font-semibold">City</label>

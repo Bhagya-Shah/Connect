@@ -31,7 +31,8 @@ export async function startAsNutritionist(_: FormState, form: FormData): Promise
     { nutritionist_id: user.id, name: "First consultation", type: "call", details: "45 min video call", price: 999 },
     { nutritionist_id: user.id, name: "Free 10 min intro call", type: "call", details: "Meet before you decide", price: 0 },
   ]);
-  redirect("/pro/business?welcome=1");
+  const next = String(form.get("next") || "");
+  redirect(next.startsWith("/join-clinic/") ? next : "/pro/business?welcome=1");
 }
 
 export async function startAsClient(_: FormState, form: FormData): Promise<FormState> {

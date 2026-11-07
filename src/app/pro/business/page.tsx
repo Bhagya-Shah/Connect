@@ -8,6 +8,8 @@ import { ProfileForm } from "./ProfileForm";
 import { Services } from "./Services";
 import { Availability } from "./Availability";
 import { PlanPicker } from "./PlanPicker";
+import { InvoiceSettings } from "./InvoiceSettings";
+import { PLANS } from "@/lib/constants";
 import { LogoutButton } from "@/components/LogoutButton";
 
 export default async function BusinessPage({ searchParams }: { searchParams: Promise<{ welcome?: string }> }) {
@@ -31,11 +33,12 @@ export default async function BusinessPage({ searchParams }: { searchParams: Pro
           <Row label="Payments this month">{month.length}</Row>
           <Row label="All time">{rs((pays ?? []).reduce((a, p) => a + p.amount - p.platform_fee, 0))}</Row>
           {pays?.[0] && <Row label="Last payment">{fmtDate(pays[0].created_at)}</Row>}
-          <Link href={`/n/${me.handle}`} className="text-sm font-semibold text-accent">See my public page</Link>
+          <div className="flex flex-wrap gap-x-4 gap-y-1"><Link href="/pro/reports" className="text-sm font-semibold text-accent">Earnings report</Link><Link href="/pro/groups" className="text-sm font-semibold text-accent">Group sessions</Link><Link href="/pro/clinic" className="text-sm font-semibold text-accent">Clinic and team</Link><Link href={`/n/${me.handle}`} className="text-sm font-semibold text-accent">See my public page</Link></div>
         </section>
         <ProfileForm n={me} name={profile.full_name ?? ""} />
         <Services services={services ?? []} />
         <Availability initial={windows ?? []} />
+        <InvoiceSettings n={me} allowed={PLANS[me.plan as PlanId].invoices} />
         <PlanPicker current={me.plan as PlanId} live={paymentsLive()} keyId={process.env.RAZORPAY_KEY_ID} specialty={me.specialty} />
         <LogoutButton />
       </Body>

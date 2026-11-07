@@ -42,11 +42,22 @@ Mood, journal and check-ups are visible only to the client's therapist, never to
 Scores are calculated in the database, so they can't be edited by either side. Plans and prices are the same for
 both fields; the plan list shows therapy features to therapists (check-ups, homework and journal need Growth).
 
+### Bigger-plan features (both fields)
+
+| Plan | Feature | Where |
+| --- | --- | --- |
+| Growth | **GST invoices.** Add business name, GSTIN, address and GST rate in Business. Every paid booking gets a numbered invoice (CN-YYYY-NNNN) with taxable value, CGST and SGST, which the client opens from Account and can print or save as PDF. Starter gets a simple receipt. | `/invoice/[id]` |
+| Pro | **Earnings reports.** 12-month income bars, Connect vs own clients, income by service, top clients, recent payments and a CSV download for your accountant. | `/pro/reports` |
+| Pro | **Group sessions.** Give a service a seat count, schedule dates, and clients book a seat from your public page. Everyone joins the same video room. Seats are held for 30 minutes while paying. | `/pro/groups`, `/n/[handle]/group` |
+| Clinic | **Clinic and team.** Name, logo, about and a public clinic page. Invite up to 4 colleagues with a one-time link; members get Clinic features while they belong and go back to their own plan when they leave. Owner sees members, clients, monthly earnings and the next 7 days of sessions. | `/pro/clinic`, `/c/[slug]` |
+
+Prices include GST. Custom domains for a clinic are set up by hand (add the domain in Vercel and point it at the
+clinic page) when a clinic asks.
+
 Connect takes 10% only on clients who found the nutritionist through Connect search, never on their own clients.
 
-**Not built yet:** WhatsApp reminders (reminders go to in-app chat for now), SMS/phone login, GST invoice PDFs,
-group classes, clinic team accounts and custom domains, AI photo check, Android/iPhone apps
-(the web app can be added to the home screen).
+**Not built yet:** WhatsApp reminders (reminders go to in-app chat for now), SMS/phone login, automatic custom
+domains, AI photo check, Android/iPhone apps (the web app can be added to the home screen).
 
 ## Run it on your computer
 
