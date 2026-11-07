@@ -146,6 +146,19 @@ textarea.in{resize:vertical;min-height:70px}
 .scale button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .photo{width:56px;height:56px;border-radius:10px;flex:none;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--muted);text-align:center;line-height:1.1}
 .stars{color:var(--saffron);letter-spacing:1px}
+.ph{flex:none;border-radius:12px;display:grid;place-items:center;overflow:hidden;position:relative}
+.ph .plate{width:74%;aspect-ratio:1;border-radius:50%;background:var(--surface);border:3px solid rgba(255,255,255,.55);box-shadow:0 2px 6px rgba(0,0,0,.08);display:grid;place-items:center;text-align:center;font-size:10.5px;font-weight:600;line-height:1.15;padding:6px;color:var(--ink);overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph.sm{width:64px;height:64px}
+.ph.lg{width:100%;aspect-ratio:4/3;border-radius:14px}
+.ph.lg .plate{width:46%;font-size:13px}
+.addph{width:64px;height:64px;border-radius:12px;border:1.5px dashed var(--accent);color:var(--accent);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:600;cursor:pointer;flex:none;background:var(--accent-soft);line-height:1.2}
+.addph input{position:absolute;width:1px;height:1px;opacity:0}
+.fb{background:var(--good-soft);border-radius:10px;padding:8px 10px;font-size:13px}
+.grid7{display:grid;grid-template-columns:78px repeat(5,1fr);gap:4px;font-size:11.5px}
+.grid7 .g{height:22px;border-radius:6px}
+.g.ok{background:var(--good)} .g.off{background:var(--saffron)} .g.miss{background:var(--bad-soft);border:1px dashed var(--bad)} .g.later{background:var(--surface-2)}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
 select.in{appearance:auto}
 @media (max-width:860px){
   .page{flex-direction:column;align-items:stretch;gap:20px;padding-block:16px}
@@ -195,6 +208,7 @@ const IC={
  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'),
  meal:svg('<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 2-3 5-3 8h4v10"/>'),
  chart:svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+cam:svg('<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>'),
  me:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'),
  ok:'<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
 };
@@ -262,11 +276,20 @@ const TEMPLATES=[
  {n:'Pregnancy, 2nd trimester',k:2200,tag:'Pregnancy',meals:[['Early morning','7:00',['Milk with dates']],['Breakfast','9:00',['Vegetable poha','Boiled egg or paneer']],['Lunch','13:30',['3 rotli','Dal, palak paneer','Curd']],['Evening','17:00',['Fruit + nuts']],['Dinner','20:00',['Rice, dal, shaak']]]},
  {n:'Muscle gain, high protein',k:2600,tag:'Gym',meals:[['Breakfast','8:00',['Paneer paratha (2)','Curd']],['Pre-workout','11:00',['Banana + peanut butter']],['Lunch','13:30',['Rice, rajma','Chicken or soya curry']],['Evening','17:30',['Whey or sattu shake']],['Dinner','20:30',['4 rotli','Dal, paneer sabzi']]]}];
 
+const FEED=[
+ {c:0,meal:'Breakfast',time:'8:40',d:'Moong dal chilla, mint chutney',plan:'Moong dal chilla (2), mint chutney'},
+ {c:4,meal:'Breakfast',time:'8:55',d:'Besan chilla with curd',plan:'Besan chilla, curd'},
+ {c:3,meal:'Breakfast',time:'9:05',d:'Poha with sev and a banana',plan:'Vegetable upma, 1 bowl'},
+ {c:0,meal:'Early morning',time:'6:45',d:'Jeera water, 5 almonds',plan:'Warm jeera water, 5 soaked almonds',st:'ok',reply:'Perfect start!'},
+ {c:4,meal:'Early morning',time:'7:10',d:'Methi seed water',plan:'Methi seed water',st:'ok'},
+ {c:3,meal:'Early morning',time:'7:30',d:'Tea with 2 Marie biscuits',plan:'Cinnamon water, 2 walnuts',st:'off',reply:'Swap biscuits for walnuts tomorrow.'}];
+const MISSING=[{c:1,what:'No photos for 4 days'},{c:3,what:'Mid-morning not sent (due 11:00)'},{c:4,what:'Mid-morning not sent (due 11:00)'}];
+const QUICK=['Great choice!','Smaller portion next time','Add a protein','Add salad or veggies','Less oil please'];
 const S={mode:'pro',tab:'home',stack:[],
  cFilter:'All',cTab:'Overview',goal:null,q:'',fFilters:new Set(),booking:null,
  chats:{'Ananya Patel':[['them','Good morning ma\'am! Weekend was tough, had pav bhaji at a family dinner 🙈'],['me','That\'s okay, one meal won\'t undo your week. Just go back to the plan today and add a 20 min walk.'],['them','Okay will do. Can I have chai in the evening?'],['me','Yes, one cup with less sugar is fine.']],
         'Meera Joshi':[['me','Hi Meera, I haven\'t seen your food log for 4 days. All okay?']]},
- water:5,mealsDone:new Set(['Early morning','Breakfast']),myWeights:[78,77.2,76.5,76.1,75.4,74.8,74.1],checkin:{energy:4,hunger:2},
+ water:5,photos:{'Early morning':{d:'Jeera water, almonds',fb:'Perfect start!'},'Breakfast':{d:'Moong dal chilla',fb:null}},feedTab:'To review',myWeights:[78,77.2,76.5,76.1,75.4,74.8,74.1],checkin:{energy:4,hunger:2},
  mine:[{who:'Priya Mehta',what:'Week 8 check-in',when:'Mon 10 Nov · 10:00'}],
  svcs:ME_PRO.svcs.slice(),plan:null,planFor:'Ananya Patel'};
 
@@ -288,11 +311,15 @@ function bars(vals,labels){const W=320,H=120,max=Math.max(...vals),bw=(W-20)/val
  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Earnings by month">${vals.map((v,i)=>{const h=(v/max)*(H-40),x=10+i*(bw+10);const last=i===vals.length-1;
   return `<rect x="${x}" y="${H-20-h}" width="${bw}" height="${h}" rx="4" fill="${last?'var(--accent)':'var(--accent-soft)'}"/><text x="${x+bw/2}" y="${H-5}" font-size="11" text-anchor="middle" fill="var(--muted)">${labels[i]}</text>${last?`<text x="${x+bw/2}" y="${H-26-h}" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">${(v/1000).toFixed(1)}k</text>`:''}`}).join('')}</svg>`;}
 const statusPill=s=>`<span class="pill ${s==='On track'?'good':s==='New'?'blue':s==='Not logging'?'bad':'warn'}">${s}</span>`;
+const ph=(d,size,img)=>`<span class="ph ${size}" style="background:${tint(d)}">${img?`<img src="${img}" alt="Meal photo: ${esc(d)}">`:`<span class="plate">${esc(d.split(/[,(]/)[0].split(' ').slice(0,3).join(' '))}</span>`}</span>`;
 const bmi=c=>(c.now/((c.height/100)**2)).toFixed(1);
 
 /* ---------- Nutritionist views ---------- */
 function proHome(){const today=CLIENTS.filter(c=>c.time);
+ const toRev=FEED.filter(x=>!x.st).length;
  return{title:'Good morning, Priya',html:`
+ <button class="card" data-tab="photos" style="background:var(--accent-soft);border-color:transparent"><div class="row"><span class="grow"><span class="t">${toRev} meal photos to review</span><br><span class="s">${FEED.length} received today · ${MISSING.length} clients missing photos</span></span><span class="btn sm">Review</span></div>
+  <div class="row">${FEED.filter(x=>!x.st).slice(0,4).map(x=>ph(x.d,'sm',x.img)).join('')}</div></button>
  <div class="stats">
   <div class="stat"><span class="xs">Earned in Nov</span><b>${rs(84500)}</b></div>
   <div class="stat"><span class="xs">Active clients</span><b>24</b></div>
@@ -329,7 +356,12 @@ function proClient(i){const c=CLIENTS[i],T=S.cTab;let inner='';
   <div class="card"><div class="row"><span class="grow"><span class="t">${tp.n}</span><br><span class="s">About ${tp.k.toLocaleString('en-IN')} kcal a day · updated 31 Oct</span></span></div>
   ${tp.meals.map(([m,t,items])=>`<div class="meal"><div class="mh"><span class="t">${m}</span><span class="xs">${t}</span></div><ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>
   <button class="btn" data-template="${TEMPLATES.indexOf(tp)}" data-for="${esc(c.n)}">Edit this plan</button>`;}
- if(T==='Food log')inner=c.log.length?c.log.map(([m,t,d,st])=>`<div class="card"><div class="row"><span class="photo" style="background:${tint(d)}">Food<br>photo</span><span class="grow"><span class="t">${m}</span> <span class="xs">${t}</span><br><span class="s">${d}</span></span>${st==='ok'?'<span class="pill good">On plan</span>':'<span class="pill warn">Off plan</span>'}</div><div class="field"><input class="in" placeholder="Reply to this meal" aria-label="Comment on ${m}"><button class="btn sm" data-comment>Send</button></div></div>`).join(''):`<div class="card center"><span class="t">No food logged yet</span><span class="s">${c.status==='New'?'Logging starts after the first session.':'Send a reminder to log meals.'}</span><button class="btn ghost" data-remind>Send reminder on WhatsApp</button></div>`;
+ if(T==='Food log'){const M=['Early morning','Breakfast','Mid-morning','Lunch','Evening','Dinner'];const pat=c.status==='New'?null:c.n==='Meera Joshi'?['ok','ok','miss','miss','miss']:['ok','ok','ok','off','ok'];
+  inner=pat?`<div class="card"><div class="row"><h3 class="h3 grow">This week's photos</h3><span class="t">${c.adh}%</span></div>
+  <div class="grid7"><span></span>${['Mon','Tue','Wed','Thu','Fri'].map(d=>`<span class="xs center">${d}</span>`).join('')}
+  ${M.map((m,mi)=>`<span class="xs">${m}</span>`+[0,1,2,3,4].map(di=>{let k=pat[di];if(di===4&&mi>1)k='later';if(c.n==='Ananya Patel'&&mi===5&&di===3)k='off';else if(k==='off'&&mi!==3)k='ok';if(c.n!=='Meera Joshi'&&mi===2&&di===1)k='miss';return `<span class="g ${k}" title="${m}"></span>`}).join('')).join('')}</div>
+  <div class="legend"><span><i style="background:var(--good)"></i>On plan</span><span><i style="background:var(--saffron)"></i>Off plan</span><span><i style="background:var(--bad-soft);border:1px dashed var(--bad)"></i>Missing</span></div></div>`:'';
+  inner+=c.log.length?c.log.map(([m,t,d,st])=>`<div class="card"><div class="row">${ph(d,'sm')}<span class="grow"><span class="t">${m}</span> <span class="xs">${t}</span><br><span class="s">${d}</span></span>${st==='ok'?'<span class="pill good">On plan</span>':'<span class="pill warn">Off plan</span>'}</div><div class="field"><input class="in" placeholder="Reply to this meal" aria-label="Comment on ${m}"><button class="btn sm" data-comment>Send</button></div></div>`).join(''):`<div class="card center"><span class="t">No food logged yet</span><span class="s">${c.status==='New'?'Logging starts after the first session.':'Send a reminder to log meals.'}</span><button class="btn ghost" data-remind>Send reminder on WhatsApp</button></div>`;}
  if(T==='Notes')inner=`<div class="card"><span class="s">Private to you. Clients never see these.</span>
   <div class="field"><input class="in" id="noteIn" placeholder="Add a note from today"><button class="btn sm" id="addNote" data-i="${i}">Save</button></div>
   ${c.notes.map(([d,t])=>`<div class="note"><div class="xs">${d}</div>${esc(t)}</div>`).join('')}</div>`;
@@ -338,6 +370,22 @@ function proClient(i){const c=CLIENTS[i],T=S.cTab;let inner='';
  <div class="row">${av(c.n,true)}<div class="grow"><div class="t">${c.plan}</div><div class="s">${c.week}${c.time?' · Session today '+c.time:''}</div><div style="margin-top:4px">${statusPill(c.status)}</div></div></div>
  <div class="row"><button class="btn sm" data-call>Video call</button><button class="btn sm ghost" data-chat="${esc(c.n)}">Message</button></div>
  <div class="seg" role="group" aria-label="Client sections">${['Overview','Diet plan','Food log','Notes','Files'].map(t=>`<button data-ctab="${t}" aria-pressed="${T===t}">${t}</button>`).join('')}</div>${inner}`};}
+
+function proPhotos(){const T=S.feedTab;const rev=FEED.filter(x=>!x.st),done=FEED.filter(x=>x.st);
+ let inner='';
+ if(T==='To review')inner=rev.length?rev.map(x=>{const i=FEED.indexOf(x),c=CLIENTS[x.c];return `<div class="card">
+  <div class="row">${av(c.n)}<span class="grow"><span class="t">${c.n}</span><br><span class="s">${x.meal} · sent ${x.time}</span></span><button class="chip" data-client="${x.c}">Profile</button></div>
+  ${ph(x.d,'lg',x.img)}
+  <div class="sep"><span class="s">Photo</span><span>${esc(x.d)}</span></div><div class="sep"><span class="s">Plan said</span><span>${esc(x.plan)}</span></div>
+  <div class="row"><button class="btn sm" data-mark="${i}-ok" style="background:var(--good)">On plan</button><button class="btn sm" data-mark="${i}-off" style="background:var(--saffron);color:#2A1A00">Off plan</button></div>
+  <div class="quick">${QUICK.map(q=>`<button class="chip" data-quick="${i}">${q}</button>`).join('')}</div>
+  <div class="field"><input class="in" id="rep-${i}" placeholder="Or write a reply" aria-label="Reply to ${c.n}"><button class="btn sm" data-reply="${i}">Send</button></div></div>`}).join(''):'<div class="card center"><span class="t">All caught up</span><span class="s">New photos show up here as clients send them.</span></div>';
+ if(T==='Reviewed')inner=done.map(x=>{const c=CLIENTS[x.c];return `<div class="card"><div class="row">${ph(x.d,'sm',x.img)}<span class="grow"><span class="t">${c.n}</span> <span class="xs">${x.meal} · ${x.time}</span><br><span class="s">${esc(x.d)}</span></span>${x.st==='ok'?'<span class="pill good">On plan</span>':'<span class="pill warn">Off plan</span>'}</div>${x.reply?`<div class="fb">You: ${esc(x.reply)}</div>`:''}</div>`}).join('');
+ if(T==='Missing')inner=`<div class="card"><div class="list">${MISSING.map(m=>{const c=CLIENTS[m.c];return `<div class="item">${av(c.n)}<span class="grow"><span class="t">${c.n}</span><br><span class="s">${m.what}</span></span><button class="btn sm ghost" data-remind>Remind</button></div>`}).join('')}</div></div>
+  <button class="btn" data-remind>Remind all on WhatsApp</button><span class="xs center">Clients also get an automatic nudge 30 min after each meal time.</span>`;
+ return{title:'Meal photos · Today',html:`
+ <div class="stats"><div class="stat"><span class="xs">Received</span><b>${FEED.length}</b></div><div class="stat"><span class="xs">To review</span><b>${rev.length}</b></div><div class="stat"><span class="xs">Missing</span><b>${MISSING.length}</b></div></div>
+ <div class="seg" role="group" aria-label="Photo list">${['To review','Reviewed','Missing'].map(t=>`<button data-feedtab="${t}" aria-pressed="${T===t}">${t}</button>`).join('')}</div>${inner}`};}
 
 function proPlans(){return{title:'Diet plans',html:`
  <span class="s">Start from a template, change it for each client, and send it in one tap. Clients see it in their app, not as a PDF lost in WhatsApp.</span>
@@ -373,6 +421,7 @@ function proMore(){return{title:'My business',html:`
  <div class="card"><div class="row"><h3 class="h3 grow">Reviews</h3><span class="stars">★★★★★</span><span class="t">4.9</span></div>
   <div class="note"><div class="xs">Ananya P. · 2 weeks ago</div>Lost 4 kg without giving up rotli and dal. Plan, photos and chat all in one place.</div>
   <div class="note"><div class="xs">Riddhi S. · 1 month ago</div>My cycles are regular again after 3 months. Very patient.</div></div>
+ <button class="card" data-open="cal"><div class="row"><span class="grow"><span class="t">Availability and calendar</span><br><span class="s">Open slots, session length, chat hours</span></span><span class="s">›</span></div></button>
  <div class="card"><h3 class="h3">Settings</h3><div class="sep"><span>Qualification shown</span><span class="t">M.Sc. Nutrition, RD</span></div><div class="sep"><span>GST number</span><span class="t">24ABCDE1234F1Z5</span></div><div class="sep"><span>Plan</span><span class="t">Connect Pro · ₹499/mo</span></div></div>`};}
 
 /* ---------- Shared chat ---------- */
@@ -383,6 +432,7 @@ function chatView(who){const msgs=S.chats[who]||(S.chats[who]=[]);const meIsPro=
 /* ---------- User views ---------- */
 function uHome(){return{title:'Hi Ananya',html:`
  <div class="card" style="background:var(--accent-soft);border-color:transparent"><div class="row"><span class="grow"><span class="xs">Next session</span><br><span class="t">${S.mine[0].what} with ${S.mine[0].who}</span><br><span class="s">${S.mine[0].when}</span></span><button class="btn sm" data-go="me">View</button></div></div>
+ <button class="card" data-go="plan"><div class="row"><span class="grow"><span class="t">Today's meal photos: ${Object.keys(S.photos).length} of 6 sent</span><br><span class="s">Next: ${['Early morning','Breakfast','Mid-morning','Lunch','Evening','Dinner'].find(m=>!S.photos[m])||'All done'}</span></span><span class="btn sm">Add photo</span></div></button>
  <h3 class="h3">What do you need help with?</h3>
  <div class="boxes">${GOALS.map((g,i)=>`<button class="box" data-goal="${g.id}" style="background:${TINTS[i%6]}"><span class="bn">${g.n}</span><span class="bl">${g.l}</span></button>`).join('')}</div>
  <h3 class="h3">Ways to consult</h3>
@@ -459,12 +509,12 @@ function uDone(){const b=S.booking,e=NUTS[b.e];return{title:'Booked',html:`
  <div class="card"><div class="sep"><span>Video call link</span><span class="t">In the app</span></div><div class="sep"><span>Reminder</span><span class="t">WhatsApp, 1 hour before</span></div><div class="sep"><span>Invoice</span><span class="t">${svcOf(b).price?'Sent to email':'No charge'}</span></div><div class="sep"><span>Your intake form</span><span class="t">Shared</span></div></div>
  <button class="btn" data-go="me">See my sessions</button>`};}
 
-function uPlan(){const tp=TEMPLATES[0];const done=S.mealsDone.size,tot=tp.meals.length;
- return{title:'My plan · Fri 7 Nov',html:`
- <div class="card"><div class="sep"><span class="t">Today</span><span class="s">${done} of ${tot} meals done</span></div><div class="bar"><i style="width:${done/tot*100}%"></i></div></div>
+function uPlan(){const tp=TEMPLATES[0];const done=Object.keys(S.photos).length,tot=tp.meals.length;
+ return{title:'Today · Fri 7 Nov',html:`
+ <div class="card"><div class="sep"><span class="t">Meal photos sent to Priya</span><span class="s">${done} of ${tot}</span></div><div class="bar"><i style="width:${done/tot*100}%"></i></div><span class="xs">Snap each meal before you eat. Priya checks it against your plan and replies here.</span></div>
  <div class="card"><div class="sep"><span class="t">Water</span><span class="s">${S.water} of 8 glasses</span></div><div class="glasses">${Array.from({length:8},(_,i)=>`<button class="glass" data-water="${i+1}" aria-pressed="${i<S.water}" aria-label="${i+1} glasses"></button>`).join('')}</div></div>
  <div class="card"><div class="row"><span class="grow"><span class="t">${tp.n}</span><br><span class="xs">From Priya Mehta · updated 31 Oct</span></span></div>
- ${tp.meals.map(([m,t,items])=>`<div class="meal"><label class="check"><input type="checkbox" data-meal="${m}" ${S.mealsDone.has(m)?'checked':''}><span class="grow"><span class="mh"><span class="t strike">${m}</span><span class="xs">${t}</span></span><span class="s">${items.join(' · ')}</span></span></label><div class="row"><button class="chip" data-photo="${m}">Add photo</button><button class="chip" data-swap="${m}">Ask for a swap</button></div></div>`).join('')}</div>
+ ${tp.meals.map(([m,t,items])=>{const P=S.photos[m];return `<div class="meal"><div class="row" style="align-items:flex-start">${P?ph(P.d,'sm',P.img):`<label class="addph">Add<br>photo<input type="file" accept="image/*" capture="environment" data-up="${m}" aria-label="Add photo for ${m}"></label>`}<span class="grow"><span class="mh"><span class="t">${m}</span><span class="xs">${t}</span></span><span class="s">${items.join(' · ')}</span><br>${P?(P.fb?'':'<span class="pill blue">Sent · waiting for Priya</span>'):'<button class="chip" data-swap="'+m+'" style="margin-top:6px">Ask for a swap</button>'}</span></div>${P&&P.fb?`<div class="fb"><b>Priya:</b> ${esc(P.fb)}</div>`:''}</div>`}).join('')}</div>
  <div class="card"><h3 class="h3">Tips from Priya</h3><div class="note">Eating out this weekend? Pick dal, roti and a salad first. Skip the fried starters.</div></div>`};}
 
 function uProgress(){const w=S.myWeights,c=S.checkin;return{title:'My progress',html:`
@@ -485,13 +535,13 @@ function uMe(){return{title:'Me',html:`
  <div class="card"><h3 class="h3">Payments</h3><div class="sep"><span>12-week weight loss plan</span><span>${rs(9439)}</span></div><span class="xs">Paid 19 Sep · GST invoice in your email</span></div>`};}
 
 /* ---------- Render ---------- */
-const PRO_TABS=[['home','Home',IC.home],['clients','Clients',IC.users],['plans','Plans',IC.plan],['cal','Calendar',IC.cal],['more','Business',IC.more]];
-const U_TABS=[['home','Home',IC.home],['find','Find',IC.search],['plan','My plan',IC.meal],['progress','Progress',IC.chart],['me','Me',IC.me]];
-const TRY={pro:['Open "Needs your attention" and message Meera','Open Ananya, then the Diet plan and Food log tabs','Plans: open a template, add a food, send it to a client','Business: earnings, services, group class, reviews'],
- user:['Tap a goal box, like PCOS and PCOD','Open a nutritionist, pick a service, book and pay','My plan: tick meals and fill water glasses','Progress: log your weight and send a check-in']};
+const PRO_TABS=[['home','Home',IC.home],['photos','Meal photos',IC.cam],['clients','Clients',IC.users],['plans','Plans',IC.plan],['more','Business',IC.more]];
+const U_TABS=[['home','Home',IC.home],['plan','Today',IC.cam],['find','Find',IC.search],['progress','Progress',IC.chart],['me','Me',IC.me]];
+const TRY={pro:['Meal photos: mark a photo on plan or off plan, send a quick reply','Remind clients who haven\'t sent photos','Open Ananya, then the Food log tab for her week of photos','Plans: open a template, add a food, send it to a client','Business: earnings, services, group class, reviews'],
+ user:['Today: add a real photo for a meal from your phone or computer','Then switch to Nutritionist: your photo is in her feed','Tap a goal box on Home, like PCOS and PCOD','Open a nutritionist, pick a service, book and pay','Progress: log your weight and send a check-in']};
 function current(){const top=S.stack.at(-1);
- if(top){const[k,a]=top;return({client:proClient,builder:proBuilder,chat:chatView,goal:()=>uFind(true),nut:uNut,book:uBook,intake:uIntake,pay:uPay,done:uDone})[k](a);}
- if(S.mode==='pro')return({home:proHome,clients:proClients,plans:proPlans,cal:proCal,more:proMore})[S.tab]();
+ if(top){const[k,a]=top;return({cal:()=>({...proCal(),back:true}),client:proClient,builder:proBuilder,chat:chatView,goal:()=>uFind(true),nut:uNut,book:uBook,intake:uIntake,pay:uPay,done:uDone})[k](a);}
+ if(S.mode==='pro')return({home:proHome,photos:proPhotos,clients:proClients,plans:proPlans,more:proMore})[S.tab]();
  return({home:uHome,find:()=>uFind(false),plan:uPlan,progress:uProgress,me:uMe})[S.tab]();}
 function render(keepScroll){const sc=$('view').scrollTop;const v=current();
  $('top').innerHTML=(v.back?'<button class="back" id="back" aria-label="Back">‹</button>':'')+`<h2>${esc(v.title)}</h2>`;
@@ -506,10 +556,15 @@ function setMode(m){S.mode=m;S.tab='home';S.stack=[];S.goal=null;render();try{hi
 
 document.addEventListener('click',ev=>{const t=ev.target.closest('button');if(!t)return;const d=t.dataset;
  if(d.mode)return setMode(d.mode);
- if(d.tab){S.tab=d.tab;S.stack=[];if(d.tab==='find')S.goal=null;return render();}
+ if(d.tab){S.tab=d.tab;S.stack=[];if(d.tab==='photos')S.feedTab='To review';if(d.tab==='find')S.goal=null;return render();}
  if(t.id==='back'){S.stack.pop();if(!S.stack.some(x=>x[0]==='goal')&&S.tab!=='find')S.goal=null;return render();}
  // nutritionist
  if(d.client!==undefined){S.cTab='Overview';return go('client',+d.client);}
+ if(d.feedtab){S.feedTab=d.feedtab;return render(true);}
+ if(d.open)return go(d.open);
+ if(d.mark){const[i,k]=d.mark.split('-');FEED[+i].st=k;render(true);return toast(k==='ok'?'Marked on plan':'Marked off plan');}
+ if(d.quick!==undefined){const x=FEED[+d.quick];x.reply=t.textContent;x.st=x.st||'ok';syncFb(x);render(true);return toast('Reply sent: '+t.textContent);}
+ if(d.reply!==undefined){const x=FEED[+d.reply],v=$('rep-'+d.reply).value.trim();if(!v)return toast('Type a reply first');x.reply=v;x.st=x.st||'ok';syncFb(x);render(true);return toast('Reply sent');}
  if(d.cfilter){S.cFilter=d.cfilter;return render(true);}
  if(d.ctab){S.cTab=d.ctab;return render(true);}
  if(d.template!==undefined){const tp=TEMPLATES[+d.template];S.plan={...tp,meals:tp.meals.map(([a,b,c])=>[a,b,c.slice()]),extra:0};if(d.for)S.planFor=d.for;return go('builder');}
@@ -547,7 +602,6 @@ document.addEventListener('click',ev=>{const t=ev.target.closest('button');if(!t
  if(t.id==='payNow')return finish();
  if(d.go){S.tab=d.go;S.stack=[];if(d.go==='find')S.goal=null;return render();}
  if(d.water){const n=+d.water;S.water=S.water===n?n-1:n;return render(true);}
- if(d.photo)return toast('Camera opens here. Priya sees the photo.');
  if(d.swap)return toast('Swap request sent for '+d.swap.toLowerCase());
  if(t.id==='logW'){const w=parseFloat($('wIn').value);if(!(w>20&&w<300))return toast('Enter your weight in kg');S.myWeights.push(w);if(S.myWeights.length>9)S.myWeights.shift();render(true);return toast('Logged. Priya can see it too.');}
  if(d.energy){S.checkin.energy=+d.energy;return render(true);}
@@ -555,8 +609,11 @@ document.addEventListener('click',ev=>{const t=ev.target.closest('button');if(!t
  if(t.id==='sendCk')return toast('Check-in sent to Priya');
 });
 function finish(){const b=S.booking,e=NUTS[b.e],s=svcOf(b);S.mine.unshift({who:e.n,what:s.name,when:`${DN[b.day-10]} ${b.day} Nov · ${b.slot}`});S.stack=[['done']];render();}
+function syncFb(x){if(x.c===0&&S.photos[x.meal])S.photos[x.meal].fb=x.reply;}
 document.addEventListener('change',ev=>{const d=ev.target.dataset;
- if(d.meal){ev.target.checked?S.mealsDone.add(d.meal):S.mealsDone.delete(d.meal);render(true);}
+ if(d.up){const file=ev.target.files&&ev.target.files[0];if(!file)return;const m=d.up;const rd=new FileReader();rd.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,480/Math.max(img.width,img.height));c.width=img.width*k;c.height=img.height*k;c.getContext('2d').drawImage(img,0,0,c.width,c.height);const url=c.toDataURL('image/jpeg',.8);
+   const plan=TEMPLATES[0].meals.find(x=>x[0]===m)[2].join(', ');const now=new Date();const tm=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+   S.photos[m]={d:m+' photo',img:url,fb:null};FEED.unshift({c:0,meal:m,time:tm,d:'Your photo',plan,img:url});render(true);toast('Sent to Priya. Switch to Nutritionist to see it.');};img.src=rd.result;};rd.readAsDataURL(file);}
  if(d.done!==undefined&&ev.target.checked)toast('Done');});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='msgIn')$('sendMsg').click();});
 document.addEventListener('input',ev=>{const t=ev.target;

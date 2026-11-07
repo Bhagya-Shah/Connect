@@ -4,7 +4,7 @@ Starting with nutrition. One app where people find experts (nutritionists, CAs, 
 
 ## What's here
 
-- `demo/index.html`: a clickable nutrition-first demo with example data. Two views: Nutritionist (clients, diet plans, food logs, calendar, earnings) and User (goal boxes, booking, intake, payment, daily plan, progress, chat).
+- `demo/index.html`: a clickable nutrition-first demo with example data. Built around daily meal photos. Two views: Nutritionist (meal photo review feed, clients, diet plans, food logs, calendar, earnings) and User (goal boxes, booking, intake, payment, daily plan, progress, chat).
 
 ## Plan for the first real version
 
