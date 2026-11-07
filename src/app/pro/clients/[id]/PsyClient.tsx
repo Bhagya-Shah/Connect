@@ -7,7 +7,7 @@ import { Chat } from "@/components/Chat";
 import { endClient, updateClient } from "../../actions";
 import { addSessionNote, assignHomework, cancelCheckup, deleteHomework, requestCheckup } from "../../psy-actions";
 
-export const PSY_TABS = [["overview", "Overview"], ["notes", "Session notes"], ["homework", "Homework"], ["checkups", "Check-ups"], ["journal", "Journal"], ["chat", "Chat"]] as const;
+export const PSY_TABS = [["overview", "Overview"], ["notes", "Notes"], ["homework", "Homework"], ["checkups", "Check-ups"], ["journal", "Journal"], ["chat", "Chat"]] as const;
 
 type Link_ = { client_id: string; program: string | null; goal: string | null; consent_at: string | null };
 
