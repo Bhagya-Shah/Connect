@@ -42,7 +42,7 @@ export function ProfileForm({ n, name }: { n: Nutritionist; name: string }) {
       <span className="text-xs text-muted">Food plans you make</span><Checks name="food_types" options={FOOD_TYPES} value={n.food_types} />
       <div className="grid grid-cols-2 gap-2">
         <label className="text-xs text-muted">Session length (min)<input name="session_minutes" inputMode="numeric" defaultValue={n.session_minutes} className="input" /></label>
-        <label className="text-xs text-muted">Video call link<input name="meet_url" defaultValue={n.meet_url ?? ""} className="input" placeholder="meet.google.com/…" /></label>
+        <span className="self-end pb-2.5 text-xs text-muted">Video calls happen inside Connect. A Join button appears 5 min before each session.</span>
       </div>
       {state?.error && <p role="alert" className="text-sm text-bad">{state.error}</p>}
       {state?.ok && <p className="text-sm text-good">Saved.</p>}

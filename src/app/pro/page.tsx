@@ -5,6 +5,7 @@ import { photoUrls } from "@/lib/photos";
 import { Avatar, FoodTile, Pill, Stat, TopBar } from "@/components/ui";
 import { Body } from "@/components/Shell";
 import { CopyButton } from "@/components/CopyButton";
+import { callState } from "@/lib/call";
 
 export default async function ProHome() {
   const { supabase, user, profile, me } = await requireNutritionist();
@@ -12,7 +13,7 @@ export default async function ProHome() {
   const [{ data: links }, { data: pending }, { data: bookings }, { data: pays }, { data: recent }] = await Promise.all([
     supabase.from("client_links").select("client_id, program, profiles:client_id(full_name)").eq("nutritionist_id", user.id).eq("status", "active"),
     supabase.from("meal_logs").select("id, meal_name, photo_path, planned").eq("nutritionist_id", user.id).eq("status", "pending").order("created_at", { ascending: false }).limit(50),
-    supabase.from("bookings").select("id, starts_at, service_name, status, client:client_id(full_name)").eq("nutritionist_id", user.id).in("status", ["confirmed", "pending_payment"]).gte("starts_at", new Date().toISOString()).order("starts_at").limit(5),
+    supabase.from("bookings").select("id, starts_at, ends_at, service_name, status, client:client_id(full_name)").eq("nutritionist_id", user.id).in("status", ["confirmed", "pending_payment"]).gte("ends_at", new Date().toISOString()).order("starts_at").limit(5),
     supabase.from("payments").select("amount, platform_fee").eq("nutritionist_id", user.id).eq("status", "paid").gte("created_at", monthStart + "T00:00:00+05:30"),
     supabase.from("meal_logs").select("client_id, created_at").eq("nutritionist_id", user.id).gte("log_date", new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10)),
   ]);
@@ -58,7 +59,7 @@ export default async function ProHome() {
                 <span className="w-16 flex-none text-sm"><b className="font-display">{fmtTime(b.starts_at)}</b><br /><span className="text-xs text-muted">{fmtDate(b.starts_at)}</span></span>
                 <Avatar name={c?.full_name} />
                 <span className="min-w-0 flex-1"><b>{c?.full_name || "Client"}</b><br /><span className="text-sm text-muted">{b.service_name}</span></span>
-                {b.status === "pending_payment" && <Pill tone="warn">Unpaid</Pill>}
+                {b.status === "pending_payment" ? <Pill tone="warn">Unpaid</Pill> : callState(b) === "open" && <Link href={`/call/${b.id}`} className="btn btn-sm">Join call</Link>}
               </div>
             );
           }) : <p className="text-sm text-muted">No upcoming sessions. Share your booking link below.</p>}

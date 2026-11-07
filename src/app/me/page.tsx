@@ -6,6 +6,7 @@ import { FoodTile, Pill, TopBar } from "@/components/ui";
 import { Body } from "@/components/Shell";
 import { GoalBoxes } from "@/components/GoalBoxes";
 import { MealPhoto } from "./MealPhoto";
+import { callState } from "@/lib/call";
 
 export default async function Today({ searchParams }: { searchParams: Promise<{ joined?: string }> }) {
   const sp = await searchParams;
@@ -26,7 +27,7 @@ export default async function Today({ searchParams }: { searchParams: Promise<{ 
   const [{ data: plans }, { data: logs }, { data: next }] = await Promise.all([
     supabase.from("diet_plans").select("*").eq("client_id", user.id).eq("active", true),
     supabase.from("meal_logs").select("*").eq("client_id", user.id).eq("log_date", today).order("created_at"),
-    supabase.from("bookings").select("starts_at, service_name").eq("client_id", user.id).eq("status", "confirmed").gte("starts_at", new Date().toISOString()).order("starts_at").limit(1).maybeSingle(),
+    supabase.from("bookings").select("id, starts_at, ends_at, status, service_name").eq("client_id", user.id).eq("status", "confirmed").gte("ends_at", new Date().toISOString()).order("starts_at").limit(1).maybeSingle(),
   ]);
   const urls = await photoUrls(supabase, (logs ?? []).map((l) => l.photo_path));
   return (
@@ -34,7 +35,7 @@ export default async function Today({ searchParams }: { searchParams: Promise<{ 
       <TopBar title={`Today · ${fmtDate(new Date(), { weekday: "short", day: "numeric", month: "short" })}`} />
       <Body>
         {sp.joined && <p className="rounded-xl bg-good-soft p-3 text-sm">You&apos;re connected. Your plan and meal photos live here.</p>}
-        {next && <Link href="/me/account" className="card border-transparent bg-accent-soft"><span className="text-xs text-muted">Next session</span><b>{next.service_name}</b><span className="text-sm text-muted">{fmtDate(next.starts_at)} at {fmtTime(next.starts_at)}</span></Link>}
+        {next && <Link href={callState(next) === "open" ? `/call/${next.id}` : "/me/account"} className="card border-transparent bg-accent-soft"><div className="flex items-center gap-2"><span className="flex flex-1 flex-col"><span className="text-xs text-muted">Next session</span><b>{next.service_name}</b><span className="text-sm text-muted">{fmtDate(next.starts_at)} at {fmtTime(next.starts_at)}</span></span>{callState(next) === "open" && <span className="btn btn-sm">Join call</span>}</div></Link>}
         {links.map((l) => {
           const nName = (l.n as unknown as { profiles: { full_name: string } } | null)?.profiles?.full_name ?? "your nutritionist";
           const plan = plans?.find((p) => p.nutritionist_id === l.nutritionist_id);

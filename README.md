@@ -19,6 +19,7 @@ People find the right nutritionist for their goal. Nutrition first; other fields
 | Meal photos | Review feed: on plan / off plan, quick replies, missing-photo list, reminders, 7-day grid | Snap each meal (photo shrunk on the phone), see replies |
 | Progress | Weight chart, BMI, check-ins, private notes | Log weight and waist, weekly check-in |
 | Chat | Live chat per client (Growth+) | Live chat with their nutritionist |
+| Video calls | In-app call per booking (LiveKit): Join opens 5 min before, screen share, in-call chat, private notes saved to the client | Join from the booking, waiting room until the nutritionist joins |
 | Plans | Starter (free, 5 clients, 5% fee), Growth ₹499, Pro ₹999, Clinic ₹2,499, limits enforced | Free |
 
 Connect takes 10% only on clients who found the nutritionist through Connect search, never on their own clients.
@@ -54,4 +55,12 @@ Without Razorpay keys the app runs in **test mode**: "Pay" and "Switch plan" wor
      `subscription.charged`, `subscription.cancelled`, `subscription.halted`. Put its secret in `RAZORPAY_WEBHOOK_SECRET`.
    - Route (split payments): create a linked account for each nutritionist in the Razorpay dashboard and save its id
      in `nutritionists.razorpay_account_id`. Without it, the full payment lands in the Connect account.
-4. **Email**: Supabase's built-in email is rate limited. Before launch, add an SMTP provider (Resend, Amazon SES) in Auth > SMTP.
+4. **Video calls** (LiveKit). Pick one:
+   - **LiveKit Cloud** (easiest): create a project at cloud.livekit.io, then add its URL (`wss://…livekit.cloud`)
+     as `NEXT_PUBLIC_LIVEKIT_URL` and an API key/secret as `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` in Vercel.
+   - **Your own server**: a Linux VM in Mumbai (2 CPU, 4 GB RAM is plenty for 1-to-1 calls) with Docker,
+     a subdomain like `meet.yourdomain.com` pointing at it, and ports 80, 443, 7881/tcp and 50000-60000/udp open.
+     Run LiveKit's generator (`docker run --rm -it -v $PWD:/output livekit/generate`), choose your domain,
+     then start it with the files it creates. Put `wss://meet.yourdomain.com` and the generated key/secret in Vercel.
+   - Without these settings the app works, but the call page says calls aren't switched on.
+5. **Email**: Supabase's built-in email is rate limited. Before launch, add an SMTP provider (Resend, Amazon SES) in Auth > SMTP.

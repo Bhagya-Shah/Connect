@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   );
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  if (!user && (path.startsWith("/pro") || path.startsWith("/me") || path.startsWith("/onboarding"))) {
+  if (!user && (path.startsWith("/pro") || path.startsWith("/me") || path.startsWith("/onboarding") || path.startsWith("/call"))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}`;
