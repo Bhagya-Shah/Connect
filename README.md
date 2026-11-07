@@ -1,10 +1,10 @@
 # Connect
 
-One app where people find experts (nutritionists, CAs, lawyers, career coaches and more), and experts run their whole practice: booking, payments, notes, plans and client progress.
+Starting with nutrition. One app where people find experts (nutritionists, CAs, lawyers, career coaches and more), and experts run their whole practice: booking, payments, notes, plans and client progress.
 
 ## What's here
 
-- `demo/index.html`: a clickable demo with example data, to show consultants. It has two views, Consultant and Client.
+- `demo/index.html`: a clickable nutrition-first demo with example data. Two views: Nutritionist (clients, diet plans, food logs, calendar, earnings) and User (goal boxes, booking, intake, payment, daily plan, progress, chat).
 
 ## Plan for the first real version
 

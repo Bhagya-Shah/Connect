@@ -7,18 +7,21 @@
 :root{
   --bg:#EEF1F6; --surface:#FFFFFF; --surface-2:#F4F6FA; --ink:#17223A; --muted:#5B6680; --line:#DDE2EC;
   --accent:#1F5BD8; --accent-ink:#FFFFFF; --accent-soft:#E3ECFD; --saffron:#E39A2D; --saffron-soft:#FCF0DC;
-  --good:#1E8A5A; --good-soft:#DDF3E8; --warn:#B86A0A;
-  --display:"Sora", "Segoe UI", system-ui, sans-serif; --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --good:#1E8A5A; --good-soft:#DDF3E8; --warn:#A35E06; --bad:#C2413A; --bad-soft:#FBE3E1;
+  --t1:#DCE7FF; --t2:#FCE7C8; --t3:#D6F2E4; --t4:#F6DCE6; --t5:#E6E0FA; --t6:#D9F0F5;
+  --display:"Sora","Segoe UI",system-ui,sans-serif; --body:"Figtree","Segoe UI",system-ui,sans-serif;
   --frame:#0F1626;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0C1220; --surface:#151D2E; --surface-2:#1C2639; --ink:#E7ECF5; --muted:#9AA6BE; --line:#2A3650;
   --accent:#6E9BFF; --accent-ink:#0C1220; --accent-soft:#1E2E52; --saffron:#F0B55A; --saffron-soft:#3A2C14;
-  --good:#4FC48C; --good-soft:#163A2A; --warn:#F0B55A; --frame:#000000; color-scheme:dark}}
+  --good:#4FC48C; --good-soft:#163A2A; --warn:#F0B55A; --bad:#F08A82; --bad-soft:#3E1D1B;
+  --t1:#1F2C4D; --t2:#3A2C17; --t3:#173628; --t4:#3A1F2A; --t5:#2A2448; --t6:#173640; --frame:#000000; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0C1220; --surface:#151D2E; --surface-2:#1C2639; --ink:#E7ECF5; --muted:#9AA6BE; --line:#2A3650;
   --accent:#6E9BFF; --accent-ink:#0C1220; --accent-soft:#1E2E52; --saffron:#F0B55A; --saffron-soft:#3A2C14;
-  --good:#4FC48C; --good-soft:#163A2A; --warn:#F0B55A; --frame:#000000; color-scheme:dark}
+  --good:#4FC48C; --good-soft:#163A2A; --warn:#F0B55A; --bad:#F08A82; --bad-soft:#3E1D1B;
+  --t1:#1F2C4D; --t2:#3A2C17; --t3:#173628; --t4:#3A1F2A; --t5:#2A2448; --t6:#173640; --frame:#000000; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
@@ -26,7 +29,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .page{display:flex;gap:48px;justify-content:center;align-items:flex-start;padding-block:40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.intro{max-width:360px;padding-top:40px;display:flex;flex-direction:column;gap:18px}
+.intro{max-width:360px;padding-top:32px;display:flex;flex-direction:column;gap:18px}
 .brand{font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
 .dot{width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:10px 0 0 var(--saffron)}
 .intro h1{font-family:var(--display);font-size:22px;line-height:1.25;margin:0;text-wrap:balance;font-weight:600}
@@ -35,53 +38,69 @@ button{cursor:pointer}
 .switch button{flex:1;border:0;background:transparent;padding:10px 12px;border-radius:9px;font-weight:600;color:var(--muted)}
 .switch button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.prof{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.try{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .demo-note{font-size:13px;background:var(--saffron-soft);border-radius:10px;padding:10px 12px;color:var(--ink)}
-.phone{width:390px;height:800px;flex:none;background:var(--frame);border-radius:44px;padding:12px;box-shadow:0 30px 60px -30px rgba(15,22,38,.45)}
+.phone{width:390px;height:820px;flex:none;background:var(--frame);border-radius:44px;padding:12px;box-shadow:0 30px 60px -30px rgba(15,22,38,.45)}
 .screen{height:100%;background:var(--surface-2);border-radius:34px;overflow:hidden;display:flex;flex-direction:column;position:relative}
-.top{padding:18px 18px 10px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;min-height:64px}
+.top{padding:16px 16px 10px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;min-height:62px}
 .top h2{font-family:var(--display);font-size:18px;margin:0;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.back{border:0;background:var(--surface-2);width:34px;height:34px;border-radius:10px;font-size:18px;line-height:1}
-.body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
-.tabs{display:flex;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px 10px}
-.tabs button{flex:1;border:0;background:transparent;padding:8px 2px;font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
-.tabs button svg{width:22px;height:22px}
+.back{border:0;background:var(--surface-2);width:34px;height:34px;border-radius:10px;font-size:20px;line-height:1;flex:none}
+.body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;background:var(--surface);border-top:1px solid var(--line);padding:6px 4px 10px}
+.tabs button{flex:1;border:0;background:transparent;padding:6px 0;font-size:11px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.tabs svg{width:22px;height:22px}
 .tabs button[aria-current="page"]{color:var(--accent)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
-.row{display:flex;align-items:center;gap:12px;min-width:0}
+button.card{text-align:left;width:100%}
+.row{display:flex;align-items:center;gap:10px;min-width:0}
+.wrap{flex-wrap:wrap}
 .grow{flex:1;min-width:0}
 .t{font-weight:600}
 .s{font-size:13px;color:var(--muted)}
+.xs{font-size:12px;color:var(--muted)}
 .h3{font-family:var(--display);font-size:15px;font-weight:600;margin:0}
 .av{width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center;font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink)}
-.av.lg{width:64px;height:64px;border-radius:18px;font-size:22px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
-.stat b{display:block;font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.av.lg{width:60px;height:60px;border-radius:18px;font-size:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats.two{grid-template-columns:1fr 1fr}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.stat b{display:block;font-family:var(--display);font-size:19px;font-variant-numeric:tabular-nums}
 .btn{border:0;border-radius:12px;padding:12px 14px;font-weight:600;background:var(--accent);color:var(--accent-ink);width:100%}
 .btn.ghost{background:var(--accent-soft);color:var(--accent)}
 .btn.sm{width:auto;padding:8px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 .pill{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .pill.good{background:var(--good-soft);color:var(--good)}
 .pill.warn{background:var(--saffron-soft);color:var(--warn)}
 .pill.blue{background:var(--accent-soft);color:var(--accent)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
 .list{display:flex;flex-direction:column}
-.list>.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.list>.item{display:flex;align-items:center;gap:10px;padding:11px 0;border:0;border-top:1px solid var(--line);background:none;text-align:left;width:100%}
 .list>.item:first-child{border-top:0;padding-top:0}
 .list>.item:last-child{padding-bottom:0}
-.time{font-family:var(--display);font-weight:600;font-size:14px;width:52px;flex:none;font-variant-numeric:tabular-nums}
+.time{font-family:var(--display);font-weight:600;font-size:14px;width:48px;flex:none;font-variant-numeric:tabular-nums}
 .link-box{display:flex;gap:8px;align-items:center;background:var(--surface-2);border-radius:10px;padding:8px 8px 8px 12px;font-size:13px}
 .link-box span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;user-select:all}
 .check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
-.check input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px}
-.check input:checked+span{text-decoration:line-through;color:var(--muted)}
+.check input{margin-top:3px;accent-color:var(--accent);width:17px;height:17px;flex:none}
+.check input:checked+span .strike{text-decoration:line-through;color:var(--muted)}
 .note{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:14px}
-.note .s{font-size:12px;margin-bottom:2px}
 .field{display:flex;gap:8px}
-.field input,.search{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.in{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;width:100%}
+textarea.in{resize:vertical;min-height:70px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;flex:none}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;white-space:nowrap;flex:none}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;flex:none}
+.seg button{flex:1;border:0;background:transparent;padding:7px 2px;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--muted);min-width:0}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.boxes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.box{border:0;border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:84px;color:var(--ink)}
+.box .bn{font-family:var(--display);font-weight:600;font-size:14px;line-height:1.25}
+.box .bl{font-size:12px;color:var(--muted);margin-top:auto}
+.ways{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.way{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:11px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.way .t{font-size:14px}
 .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .slot{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 0;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
 .slot[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -91,29 +110,47 @@ button{cursor:pointer}
 .day b{font-family:var(--display);font-size:17px;color:var(--ink)}
 .day[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .svc{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface);text-align:left;width:100%}
-.svc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.price{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums}
-.chart{width:100%;height:110px;display:block}
-.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;font-weight:500;font-size:14px;transition:opacity .2s,transform .2s}
+.price{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chart{width:100%;height:120px;display:block}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;font-weight:500;font-size:14px;transition:opacity .2s,transform .2s;z-index:5}
 .toast[hidden]{display:block!important;opacity:0;transform:translateY(8px);pointer-events:none}
 .upi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .upi button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 4px;font-weight:600;font-size:13px}
 .upi button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.big-ok{width:72px;height:72px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center;margin:20px auto 4px;font-size:36px}
+.big-ok{width:72px;height:72px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center;margin:16px auto 4px}
 .center{text-align:center}
-.sep{display:flex;justify-content:space-between;font-size:14px}
-.week{display:grid;grid-template-columns:44px repeat(5,1fr);gap:4px;font-size:12px;font-variant-numeric:tabular-nums}
+.sep{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.week{display:grid;grid-template-columns:42px repeat(5,1fr);gap:4px;font-size:12px;font-variant-numeric:tabular-nums}
 .week .hd{text-align:center;color:var(--muted);font-weight:600;padding-bottom:4px}
 .week .hr{color:var(--muted);padding-top:6px}
-.cell{border:0;border-radius:8px;height:30px;background:var(--surface-2);font-size:11px;font-weight:600;color:var(--muted)}
+.cell{border:0;border-radius:8px;height:28px;background:var(--surface-2);font-size:11px;font-weight:600;color:var(--muted)}
 .cell.open{background:var(--accent-soft);color:var(--accent)}
 .cell.booked{background:var(--saffron);color:#2A1A00}
-.legend{display:flex;gap:14px;font-size:12px;color:var(--muted)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.meal{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.meal:first-of-type{border-top:0;padding-top:0}
+.meal .mh{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.meal ul{margin:0;padding-left:18px;font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);border-radius:99px}
+.glasses{display:flex;gap:6px;flex-wrap:wrap}
+.glass{width:30px;height:38px;border-radius:6px 6px 10px 10px;border:1.5px solid var(--accent);background:transparent;padding:0}
+.glass[aria-pressed="true"]{background:var(--accent)}
+.bubble{max-width:80%;padding:9px 12px;border-radius:14px;font-size:14px}
+.bubble.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px}
+.bubble.them{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+.chatbar{display:flex;gap:8px;padding:10px 14px;background:var(--surface);border-top:1px solid var(--line)}
+.scale{display:flex;gap:6px}
+.scale button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 0;font-weight:600}
+.scale button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.photo{width:56px;height:56px;border-radius:10px;flex:none;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--muted);text-align:center;line-height:1.1}
+.stars{color:var(--saffron);letter-spacing:1px}
+select.in{appearance:auto}
 @media (max-width:860px){
   .page{flex-direction:column;align-items:stretch;gap:20px;padding-block:16px}
   .intro{max-width:none;padding-top:0}
-  .phone{width:100%;max-width:440px;margin:0 auto;height:760px;padding:0;background:transparent;box-shadow:none;border-radius:0}
+  .phone{width:100%;max-width:440px;margin:0 auto;height:780px;padding:0;background:transparent;box-shadow:none;border-radius:0}
   .screen{border-radius:20px;border:1px solid var(--line)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -122,270 +159,410 @@ button{cursor:pointer}
 <div class="page">
   <section class="intro">
     <div class="brand"><span class="dot" aria-hidden="true"></span>&nbsp;Connect</div>
-    <h1>One app where people find experts, and experts run their whole practice.</h1>
-    <p>No more moving clients to WhatsApp, Google Calendar and Excel. Booking, payments, notes, plans and progress live in one place.</p>
+    <h1>Nutritionists run their whole practice here. People find the right one for their goal.</h1>
+    <p>Booking, payments, diet plans, food logs, progress and chat in one app, instead of WhatsApp, Excel and screenshots.</p>
     <div>
       <div class="label" style="margin-bottom:8px">See the app as</div>
       <div class="switch" role="group" aria-label="View">
-        <button id="m-pro" data-mode="pro" aria-pressed="true">Consultant</button>
-        <button id="m-client" data-mode="client" aria-pressed="false">Client</button>
+        <button id="m-pro" data-mode="pro" aria-pressed="true">Nutritionist</button>
+        <button id="m-user" data-mode="user" aria-pressed="false">User</button>
       </div>
     </div>
-    <div id="profWrap">
-      <div class="label" style="margin-bottom:8px">Consultant type</div>
-      <div class="prof" id="prof"></div>
+    <div>
+      <div class="label" style="margin-bottom:8px">Things to try</div>
+      <ul class="try" id="try"></ul>
     </div>
-    <div class="demo-note">This is a clickable demo with example data. Bookings, notes and payments are not real.</div>
+    <div class="demo-note">This is a clickable demo with example data. Bookings, chats and payments are not real.</div>
   </section>
 
   <div class="phone"><div class="screen">
     <header class="top" id="top"></header>
     <main class="body" id="view"></main>
+    <div id="chatbar"></div>
     <nav class="tabs" id="tabs" aria-label="App sections"></nav>
     <div class="toast" id="toast" hidden role="status"></div>
   </div></div>
 </div>
 
 <script>
+const svg=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const IC={
- home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
- users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.5 3.5 5.2"/></svg>',
- tag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/></svg>',
- cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
- search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
- me:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>'
+ home:svg('<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
+ users:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.5 3.5 5.2"/>'),
+ plan:svg('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>'),
+ cal:svg('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+ more:svg('<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>'),
+ search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'),
+ meal:svg('<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 2-3 5-3 8h4v10"/>'),
+ chart:svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+ me:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'),
+ ok:'<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
 };
-const TINTS=['#DCE7FF','#FCE7C8','#D6F2E4','#F6DCE6','#E6E0FA','#D9F0F5'];
+const TINTS=['var(--t1)','var(--t2)','var(--t3)','var(--t4)','var(--t5)','var(--t6)'];
 const tint=s=>TINTS[[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%TINTS.length];
-const ini=n=>n.replace(/^(Dr\.|CA|Adv\.)\s/,'').split(' ').map(w=>w[0]).slice(0,2).join('');
-const rs=n=>'₹'+n.toLocaleString('en-IN');
+const ini=n=>n.replace(/^Dr\.\s/,'').split(' ').map(w=>w[0]).slice(0,2).join('');
+const rs=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const av=(n,lg)=>`<span class="av${lg?' lg':''}" style="background:${tint(n)}">${ini(n)}</span>`;
 
-const PROS={
- nutri:{label:'Nutritionist',me:'Priya Mehta',title:'Nutritionist · Ahmedabad',handle:'priya-nutrition',earn:84500,
-  services:[
-   {name:'First consultation',type:'One call',dur:'45 min',price:999},
-   {name:'12-week weight loss plan',type:'Package',dur:'12 check-ins + diet plans',price:7999},
-   {name:'PCOS diet coaching',type:'Monthly',dur:'4 calls a month + chat',price:2999},
-   {name:'Ask a quick question',type:'Text answer',dur:'Reply in 24 hours',price:299}],
-  metric:'Weight (kg)',
-  clients:[
-   {n:'Ananya Patel',plan:'12-week weight loss · Week 7',status:'On track',time:'10:00',data:[78,77.2,76.5,76.1,75.4,74.8,74.1],
-    tasks:['Send week 8 diet plan','Review food photos from weekend'],notes:[['Oct 31','Cravings at night are down. Swapped evening chai biscuits for roasted chana.'],['Oct 24','Started 30 minute walks after dinner.']],files:['Blood report Oct.pdf','Week 7 diet plan.pdf']},
-   {n:'Meera Joshi',plan:'PCOS coaching · Month 2',status:'Check-in due',time:'12:30',data:[69,68.6,68.8,68.1,67.7,67.5,67.2],
-    tasks:['Ask for updated cycle log','Adjust breakfast options'],notes:[['Nov 2','Energy better in mornings. Wants more Gujarati breakfast ideas.']],files:['Thyroid test.pdf']},
-   {n:'Rahul Verma',plan:'First consultation',status:'New',time:'17:00',data:[92,92,91.5,91.6,91,90.8,90.2],
-    tasks:['Read intake form before call'],notes:[['Nov 6','Booked through Connect search. Goal: lose 10 kg before wedding in March.']],files:['Intake form.pdf']}]},
- ca:{label:'Chartered Accountant',me:'CA Rohan Desai',title:'Chartered Accountant · Surat',handle:'rohan-ca',earn:162000,
-  services:[
-   {name:'ITR filing (salaried)',type:'One-time',dur:'Done in 3 days',price:1499},
-   {name:'GST registration',type:'One-time',dur:'Documents + filing',price:2999},
-   {name:'Monthly bookkeeping',type:'Monthly',dur:'Books, GST returns, 1 call',price:4999},
-   {name:'30 min tax advice call',type:'One call',dur:'30 min video',price:799}],
-  metric:'Documents received (%)',
-  clients:[
-   {n:'Shah Textiles',plan:'Monthly bookkeeping · Since Apr',status:'On track',time:'11:00',data:[40,55,60,72,80,88,95],
-    tasks:['File GSTR-3B for October','Share P&L for Q2'],notes:[['Nov 1','October sales invoices received. Purchase bills pending from 2 suppliers.']],files:['Oct sales register.xlsx','GST certificate.pdf']},
-   {n:'Kavya Nair',plan:'ITR filing',status:'Docs pending',time:'14:00',data:[0,10,20,20,35,50,60],
-    tasks:['Ask for Form 16 from second employer','Check 80C proofs'],notes:[['Oct 29','Changed jobs in August. Has two Form 16s.']],files:['Form 16 - Employer 1.pdf']},
-   {n:'Arjun Mehta',plan:'Tax advice call',status:'New',time:'18:30',data:[0,0,10,20,30,40,50],
-    tasks:['Prepare notes on capital gains for property sale'],notes:[['Nov 6','Selling a flat in Vadodara. Wants to know about saving tax on gains.']],files:[]}]},
- career:{label:'Career coach',me:'Karan Shah',title:'Career coach · Mumbai',handle:'karan-careers',earn:58000,
-  services:[
-   {name:'Resume review',type:'Document review',dur:'Written feedback in 48 hours',price:699},
-   {name:'Mock interview',type:'One call',dur:'60 min + feedback',price:1499},
-   {name:'Job switch program',type:'Package',dur:'6 weeks, 6 calls',price:9999},
-   {name:'Study abroad guidance',type:'Package',dur:'Shortlist + SOP review',price:14999}],
-  metric:'Interview score (out of 10)',
-  clients:[
-   {n:'Sneha Kulkarni',plan:'Job switch program · Week 4',status:'On track',time:'09:30',data:[4,5,5,6,7,7,8],
-    tasks:['Send product manager case questions','Review LinkedIn headline'],notes:[['Nov 3','Got a callback from 2 companies. Nervous in salary talks, practice next session.']],files:['Resume v3.pdf']},
-   {n:'Dev Malhotra',plan:'Study abroad guidance',status:'Check-in due',time:'15:00',data:[3,4,4,5,5,6,6],
-    tasks:['Give feedback on SOP draft 2','Finalise list of 8 universities'],notes:[['Oct 30','Target: MS Data Science, Fall 2027. IELTS score 7.5.']],files:['SOP draft 2.docx','IELTS result.pdf']},
-   {n:'Ishaan Gupta',plan:'Resume review',status:'New',time:'19:00',data:[3,3,4,4,4,5,5],
-    tasks:['Review uploaded resume'],notes:[['Nov 6','Fresher, B.Tech 2026. Applying for software roles.']],files:['Resume.pdf']}]}
-};
-const EXPERTS=[
- {n:'Priya Mehta',f:'Nutritionist',cat:'Health',city:'Ahmedabad',lang:'Gujarati, Hindi, English',rating:4.9,rev:212,from:999,pro:'nutri',about:'10 years helping people with weight loss, PCOS and diabetes through simple home food.'},
- {n:'CA Rohan Desai',f:'Chartered Accountant',cat:'Finance',city:'Surat',lang:'Gujarati, Hindi, English',rating:4.8,rev:154,from:799,pro:'ca',about:'Income tax, GST and bookkeeping for salaried people and small businesses.'},
- {n:'Karan Shah',f:'Career coach',cat:'Career',city:'Mumbai',lang:'Hindi, English',rating:4.9,rev:98,from:699,pro:'career',about:'Ex-recruiter. Helps with job switches, interviews and studying abroad.'},
- {n:'Adv. Neha Iyer',f:'Property lawyer',cat:'Legal',city:'Pune',lang:'Marathi, Hindi, English',rating:4.7,rev:76,from:1199,pro:null,about:'Property papers, rent agreements and legal opinions before you buy.'},
- {n:'Aditi Rao',f:'Interior designer',cat:'Home',city:'Bengaluru',lang:'Kannada, English',rating:4.8,rev:61,from:1999,pro:null,about:'Design plans for 1 to 3 BHK homes, with a shopping list and budget.'},
- {n:'Vikram Singh',f:'Startup mentor',cat:'Business',city:'Delhi',lang:'Hindi, English',rating:4.6,rev:43,from:2499,pro:null,about:'Business plans, pitch decks and first 100 customers for new founders.'},
- {n:'Dr. Sana Khan',f:'Psychologist',cat:'Health',city:'Online',lang:'Urdu, Hindi, English',rating:4.9,rev:187,from:1499,pro:null,about:'Talk therapy for stress, anxiety and relationships. Private and safe.'}
-];
-const GENERIC_SVC=e=>[{name:'Consultation call',type:'One call',dur:'45 min video',price:e.from},{name:'Ask a quick question',type:'Text answer',dur:'Reply in 24 hours',price:Math.round(e.from*0.35/10)*10-1}];
+/* ---------- Data ---------- */
+const GOALS=[
+ {id:'wl',n:'Weight loss',l:'8 to 12 weeks · from ₹4,999'},
+ {id:'wg',n:'Weight gain',l:'8 weeks · from ₹3,999'},
+ {id:'pcos',n:'PCOS and PCOD',l:'3 months · from ₹2,999/mo'},
+ {id:'dia',n:'Diabetes',l:'3 months · from ₹2,499/mo'},
+ {id:'thy',n:'Thyroid',l:'3 months · from ₹2,499/mo'},
+ {id:'preg',n:'Pregnancy and new moms',l:'Each trimester · from ₹3,499'},
+ {id:'kids',n:'Kids nutrition',l:'4 weeks · from ₹1,999'},
+ {id:'gym',n:'Sports and gym',l:'Monthly · from ₹2,999/mo'},
+ {id:'heart',n:'Heart and cholesterol',l:'3 months · from ₹2,499/mo'},
+ {id:'gut',n:'Gut health',l:'6 weeks · from ₹3,499'},
+ {id:'skin',n:'Skin and hair',l:'6 weeks · from ₹2,999'},
+ {id:'senior',n:'Senior nutrition',l:'Monthly · from ₹1,999/mo'}];
+const WAYS=[
+ {n:'One call',l:'45 min video · from ₹799'},
+ {n:'Package',l:'4 to 12 weeks with check-ins'},
+ {n:'Monthly coaching',l:'Calls + chat every month'},
+ {n:'Quick question',l:'Text reply in 24 hours · ₹299'},
+ {n:'Group class',l:'Live class with others · ₹199'},
+ {n:'Free intro',l:'10 min, meet before you pay'}];
+const NUTS=[
+ {n:'Priya Mehta',city:'Ahmedabad',mode:'Online + clinic',lang:['Gujarati','Hindi','English'],food:['Veg','Jain'],exp:10,rating:4.9,rev:212,goals:['wl','pcos','thy','dia','preg'],about:'Registered dietitian (M.Sc. Nutrition). 10 years helping people lose weight and manage PCOS and thyroid with simple Gujarati home food.',
+  svcs:[{name:'First consultation',type:'One call',dur:'45 min video',price:999},{name:'12-week weight loss plan',type:'Package',dur:'12 check-ins + weekly diet plans',price:7999},{name:'PCOS diet coaching',type:'Monthly',dur:'4 calls a month + chat',price:2999},{name:'Ask a quick question',type:'Text answer',dur:'Reply in 24 hours',price:299}]},
+ {n:'Dr. Farah Siddiqui',city:'Mumbai',mode:'Online',lang:['Hindi','Urdu','English'],food:['Veg','Non-veg'],exp:14,rating:4.8,rev:331,goals:['dia','heart','thy','senior'],about:'Clinical nutritionist. Diabetes and heart health plans that work with your medicines and your family meals.',
+  svcs:[{name:'Diabetes review call',type:'One call',dur:'45 min video',price:1299},{name:'3-month diabetes program',type:'Package',dur:'6 calls + weekly sugar review',price:8999}]},
+ {n:'Aarav Nair',city:'Bengaluru',mode:'Online',lang:['English','Malayalam','Hindi'],food:['Veg','Non-veg','Eggetarian'],exp:6,rating:4.9,rev:148,goals:['gym','wg','wl'],about:'Sports nutritionist for gym goers and runners. High-protein Indian meals, supplements only when needed.',
+  svcs:[{name:'Muscle gain plan',type:'Package',dur:'8 weeks, weekly macros',price:5999},{name:'Monthly gym coaching',type:'Monthly',dur:'2 calls + chat',price:2999}]},
+ {n:'Kavita Shah',city:'Surat',mode:'Online + clinic',lang:['Gujarati','Hindi'],food:['Veg','Jain'],exp:12,rating:4.7,rev:96,goals:['preg','kids','pcos'],about:'Mother and child nutrition. Pregnancy diets, new mom recovery and picky eaters.',
+  svcs:[{name:'Pregnancy diet, one trimester',type:'Package',dur:'3 calls + plan',price:3499},{name:'Kids nutrition call',type:'One call',dur:'45 min with parent',price:899}]},
+ {n:'Sneha Rao',city:'Pune',mode:'Online',lang:['Marathi','Hindi','English'],food:['Veg','Non-veg','Vegan'],exp:8,rating:4.8,rev:174,goals:['gut','skin','wl'],about:'Gut health and skin through food. Bloating, acidity, acne and hair fall.',
+  svcs:[{name:'Gut reset program',type:'Package',dur:'6 weeks, 4 calls',price:4999},{name:'Skin and hair diet call',type:'One call',dur:'45 min video',price:999}]},
+ {n:'Dr. Ramesh Iyer',city:'Chennai',mode:'Online',lang:['Tamil','English'],food:['Veg','Non-veg'],exp:20,rating:4.9,rev:405,goals:['heart','dia','senior'],about:'Senior and heart nutrition. Gentle plans for older parents, with family included.',
+  svcs:[{name:'Senior care monthly',type:'Monthly',dur:'2 calls + caregiver chat',price:1999},{name:'Cholesterol plan',type:'Package',dur:'3 months',price:6999}]}];
+const ME_PRO=NUTS[0];
 
-const S={mode:'pro',pro:'nutri',tab:'home',stack:[],cat:'All',q:'',booking:null,mine:[
-  {who:'Priya Mehta',what:'12-week weight loss plan · Week 7',when:'Mon, 10 Nov · 10:00'}],
-  myTasks:[['Log weight every Monday',true],['Send food photos for the weekend',false],['30 minute walk after dinner',false]],
-  myWeights:[78,77.2,76.5,76.1,75.4,74.8,74.1]};
+const CLIENTS=[
+ {n:'Ananya Patel',age:29,goal:'Lose 8 kg',plan:'12-week weight loss',week:'Week 7 of 12',status:'On track',time:'10:00',start:78,now:74.1,target:70,height:162,data:[78,77.2,76.5,76.1,75.4,74.8,74.1],adh:86,waist:'84 → 79 cm',food:'Veg (Gujarati)',cond:'None',
+  tasks:['Send week 8 diet plan','Review weekend food photos'],notes:[['31 Oct','Night cravings down. Swapped evening biscuits for roasted chana.'],['24 Oct','Started 30 minute walk after dinner. Sleep better.']],files:['Blood report, Oct.pdf','Week 7 diet plan.pdf'],paid:'Paid ₹7,999 on 19 Sep',
+  log:[['Breakfast','8:40','Moong dal chilla with mint chutney','ok'],['Lunch','13:20','2 rotli, dal, cabbage shaak, salad','ok'],['Evening','17:30','Masala chai and 2 khakhra','ok'],['Dinner (Sat)','21:15','Pav bhaji at a family dinner','off']]},
+ {n:'Meera Joshi',age:26,goal:'Regular cycles, lose 4 kg',plan:'PCOS coaching',week:'Month 2',status:'Not logging',time:'12:30',start:69,now:67.2,target:63,height:158,data:[69,68.6,68.8,68.1,67.7,67.5,67.2],adh:54,waist:'86 → 83 cm',food:'Jain',cond:'PCOS, low vitamin D',
+  tasks:['Ask for cycle log','Add more Jain breakfast options'],notes:[['2 Nov','Energy better in mornings. Struggles with evening snacking at work.']],files:['Hormone panel.pdf','Vitamin D report.pdf'],paid:'Paid ₹2,999 on 1 Nov',
+  log:[['Breakfast','9:10','Rajgira porridge with almonds','ok'],['Lunch','14:00','Skipped, busy at work','off']]},
+ {n:'Rahul Verma',age:34,goal:'Lose 10 kg before March wedding',plan:'First consultation',week:'New',status:'New',time:'17:00',start:92,now:92,target:82,height:176,data:[92,92,92,92,92,92,92],adh:0,waist:'102 cm',food:'Non-veg',cond:'High BP (family history)',
+  tasks:['Read intake form before call'],notes:[['6 Nov','Found you through Connect search. Works night shifts twice a week.']],files:['Intake form.pdf'],paid:'Paid ₹999 on 6 Nov',log:[]},
+ {n:'Nikita Bhatt',age:31,goal:'Thyroid weight control',plan:'PCOS coaching',week:'Month 3',status:'Check-in due',time:'',start:72,now:69.9,target:66,height:160,data:[72,71.5,71.2,70.8,70.6,70.1,69.9],adh:72,waist:'88 → 85 cm',food:'Veg',cond:'Hypothyroid',
+  tasks:['Weekly check-in overdue'],notes:[['28 Oct','TSH improved. Keep selenium foods.']],files:['TSH report.pdf'],paid:'Renews 15 Nov',log:[]},
+ {n:'Harsh Trivedi',age:42,goal:'Lower sugar (HbA1c 7.4)',plan:'12-week weight loss',week:'Week 3 of 12',status:'On track',time:'',start:88,now:86.4,target:80,height:172,data:[88,87.6,87.1,86.8,86.4,86.4,86.4],adh:79,waist:'98 → 95 cm',food:'Veg',cond:'Type 2 diabetes',
+  tasks:[],notes:[['30 Oct','Fasting sugar down from 148 to 131.']],files:['HbA1c.pdf'],paid:'Paid ₹7,999 on 17 Oct',log:[]}];
+
+const TEMPLATES=[
+ {n:'Weight loss, Gujarati veg',k:1400,tag:'Weight loss',meals:[['Early morning','6:30',['Warm jeera water','5 soaked almonds']],['Breakfast','8:30',['Moong dal chilla (2)','Mint chutney']],['Mid-morning','11:00',['1 apple or guava']],['Lunch','13:30',['2 rotli (no ghee)','Dal, 1 bowl','Seasonal shaak','Cucumber salad']],['Evening','17:00',['Tea, less sugar','Roasted chana, 1 handful']],['Dinner','20:00',['Vegetable khichdi, 1 bowl','Buttermilk']]]},
+ {n:'PCOS, Jain friendly',k:1500,tag:'PCOS',meals:[['Early morning','6:30',['Cinnamon water','2 walnuts']],['Breakfast','8:30',['Rajgira porridge','Pumpkin seeds']],['Mid-morning','11:00',['Pear or papaya']],['Lunch','13:30',['Jowar rotli (2)','Moong dal','Lauki shaak','Curd']],['Evening','17:00',['Makhana, roasted']],['Dinner','20:00',['Paneer bhurji','1 jowar rotli']]]},
+ {n:'Diabetes friendly',k:1600,tag:'Diabetes',meals:[['Early morning','6:30',['Methi seed water']],['Breakfast','8:30',['Besan chilla','Curd']],['Mid-morning','11:00',['Guava']],['Lunch','13:30',['Multigrain rotli (2)','Rajma','Salad']],['Evening','17:00',['Sprouts chaat']],['Dinner','20:00',['Dalia upma','Vegetable soup']]]},
+ {n:'Pregnancy, 2nd trimester',k:2200,tag:'Pregnancy',meals:[['Early morning','7:00',['Milk with dates']],['Breakfast','9:00',['Vegetable poha','Boiled egg or paneer']],['Lunch','13:30',['3 rotli','Dal, palak paneer','Curd']],['Evening','17:00',['Fruit + nuts']],['Dinner','20:00',['Rice, dal, shaak']]]},
+ {n:'Muscle gain, high protein',k:2600,tag:'Gym',meals:[['Breakfast','8:00',['Paneer paratha (2)','Curd']],['Pre-workout','11:00',['Banana + peanut butter']],['Lunch','13:30',['Rice, rajma','Chicken or soya curry']],['Evening','17:30',['Whey or sattu shake']],['Dinner','20:30',['4 rotli','Dal, paneer sabzi']]]}];
+
+const S={mode:'pro',tab:'home',stack:[],
+ cFilter:'All',cTab:'Overview',goal:null,q:'',fFilters:new Set(),booking:null,
+ chats:{'Ananya Patel':[['them','Good morning ma\'am! Weekend was tough, had pav bhaji at a family dinner 🙈'],['me','That\'s okay, one meal won\'t undo your week. Just go back to the plan today and add a 20 min walk.'],['them','Okay will do. Can I have chai in the evening?'],['me','Yes, one cup with less sugar is fine.']],
+        'Meera Joshi':[['me','Hi Meera, I haven\'t seen your food log for 4 days. All okay?']]},
+ water:5,mealsDone:new Set(['Early morning','Breakfast']),myWeights:[78,77.2,76.5,76.1,75.4,74.8,74.1],checkin:{energy:4,hunger:2},
+ mine:[{who:'Priya Mehta',what:'Week 8 check-in',when:'Mon 10 Nov · 10:00'}],
+ svcs:ME_PRO.svcs.slice(),plan:null,planFor:'Ananya Patel'};
 
 const $=id=>document.getElementById(id);
 let toastT;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200)}
 
-function chart(data,label){
-  const W=320,H=110,p=16,min=Math.min(...data),max=Math.max(...data),r=(max-min)||1;
-  const x=i=>p+i*(W-2*p)/(data.length-1),y=v=>H-22-(v-min)/r*(H-40);
-  const pts=data.map((v,i)=>x(i)+','+y(v)).join(' ');
-  const last=data.length-1;
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)} over 7 weeks">
-   <line x1="${p}" x2="${W-p}" y1="${y(max)}" y2="${y(max)}" stroke="var(--line)" stroke-dasharray="3 4"/>
-   <line x1="${p}" x2="${W-p}" y1="${y(min)}" y2="${y(min)}" stroke="var(--line)" stroke-dasharray="3 4"/>
+function chart(data,unit,goal){
+  const W=320,H=120,p=16,vals=goal?[...data,goal]:data,min=Math.min(...vals)-1.5,max=Math.max(...vals)+.5,r=max-min||1;
+  const x=i=>p+i*(W-2*p)/(data.length-1),y=v=>H-22-(v-min)/r*(H-36);
+  const pts=data.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),last=data.length-1;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Progress chart, now ${data[last]} ${unit}">
    <polygon points="${p},${H-22} ${pts} ${x(last)},${H-22}" fill="var(--accent-soft)"/>
+   ${goal?`<line x1="${p}" x2="${W-p}" y1="${y(goal)}" y2="${y(goal)}" stroke="var(--good)" stroke-dasharray="4 4"/><text x="${p+4}" y="${y(goal)-5}" font-size="11" fill="var(--good)">Goal ${goal}</text>`:''}
    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
    <circle cx="${x(last)}" cy="${y(data[last])}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
-   <text x="${p}" y="${H-4}" font-size="11" fill="var(--muted)">Week 1</text>
-   <text x="${W-p}" y="${H-4}" font-size="11" fill="var(--muted)" text-anchor="end">Now: ${data[last]}</text></svg>`;
-}
-const statusPill=s=>`<span class="pill ${s==='On track'?'good':s==='New'?'blue':'warn'}">${s}</span>`;
-const av=(n,lg)=>`<span class="av${lg?' lg':''}" style="background:${tint(n)}">${ini(n)}</span>`;
+   <text x="${p}" y="${H-5}" font-size="11" fill="var(--muted)">${data.length} weeks ago</text>
+   <text x="${W-p}" y="${H-5}" font-size="11" fill="var(--muted)" text-anchor="end">Now ${data[last]} ${unit}</text></svg>`;}
+function bars(vals,labels){const W=320,H=120,max=Math.max(...vals),bw=(W-20)/vals.length-10;
+ return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Earnings by month">${vals.map((v,i)=>{const h=(v/max)*(H-40),x=10+i*(bw+10);const last=i===vals.length-1;
+  return `<rect x="${x}" y="${H-20-h}" width="${bw}" height="${h}" rx="4" fill="${last?'var(--accent)':'var(--accent-soft)'}"/><text x="${x+bw/2}" y="${H-5}" font-size="11" text-anchor="middle" fill="var(--muted)">${labels[i]}</text>${last?`<text x="${x+bw/2}" y="${H-26-h}" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">${(v/1000).toFixed(1)}k</text>`:''}`}).join('')}</svg>`;}
+const statusPill=s=>`<span class="pill ${s==='On track'?'good':s==='New'?'blue':s==='Not logging'?'bad':'warn'}">${s}</span>`;
+const bmi=c=>(c.now/((c.height/100)**2)).toFixed(1);
 
-/* ---------- Consultant views ---------- */
-function proHome(){const P=PROS[S.pro];const pend=P.clients.reduce((a,c)=>a+c.tasks.length,0);
- return {title:'Good morning, '+P.me.replace(/^(CA|Dr\.)\s/,'').split(' ')[0],html:`
+/* ---------- Nutritionist views ---------- */
+function proHome(){const today=CLIENTS.filter(c=>c.time);
+ return{title:'Good morning, Priya',html:`
  <div class="stats">
-  <div class="stat"><span class="s">Earned in November</span><b>${rs(P.earn)}</b></div>
-  <div class="stat"><span class="s">Active clients</span><b>${P.clients.length+21}</b></div>
- </div>
- <div class="card"><div class="row"><h3 class="h3 grow">Today, Fri 7 Nov</h3><span class="pill blue">${P.clients.length} sessions</span></div>
-  <div class="list">${P.clients.map((c,i)=>`<button class="item" data-client="${i}"><span class="time">${c.time}</span>${av(c.n)}<span class="grow"><span class="t">${c.n}</span><br><span class="s">${c.plan}</span></span></button>`).join('')}</div></div>
- <div class="card"><div class="row"><h3 class="h3 grow">To do</h3><span class="pill warn">${pend} open</span></div>
-  ${P.clients.slice(0,2).map((c,ci)=>c.tasks.map((t,ti)=>`<label class="check"><input type="checkbox" data-task="${ci}-${ti}"><span>${t}<br><span class="s">${c.n}</span></span></label>`).join('')).join('')}</div>
- <div class="card"><h3 class="h3">Your booking link</h3><span class="s">Put this in your Instagram bio. Clients book and pay here, not on WhatsApp.</span>
-  <div class="link-box"><span id="blink">connect.app/${P.handle}</span><button class="btn sm" id="copy">Copy</button></div></div>`};}
+  <div class="stat"><span class="xs">Earned in Nov</span><b>${rs(84500)}</b></div>
+  <div class="stat"><span class="xs">Active clients</span><b>24</b></div>
+  <div class="stat"><span class="xs">Sessions this week</span><b>18</b></div></div>
+ <div class="card"><div class="row"><h3 class="h3 grow">Needs your attention</h3><span class="pill bad">3</span></div>
+  <div class="list">
+   <button class="item" data-client="1"><span class="pill bad">!</span><span class="grow"><span class="t">Meera hasn't logged food for 4 days</span><br><span class="s">Send a reminder or message her</span></span></button>
+   <button class="item" data-client="3"><span class="pill warn">!</span><span class="grow"><span class="t">Nikita's weekly check-in is late</span><br><span class="s">Plan renews on 15 Nov</span></span></button>
+   <button class="item" data-client="0"><span class="pill blue">₹</span><span class="grow"><span class="t">Ananya's plan ends in 5 weeks</span><br><span class="s">Offer a 3-month maintenance plan</span></span></button></div></div>
+ <div class="card"><div class="row"><h3 class="h3 grow">Today, Fri 7 Nov</h3><span class="pill blue">${today.length} sessions</span></div>
+  <div class="list">${today.map(c=>`<button class="item" data-client="${CLIENTS.indexOf(c)}"><span class="time">${c.time}</span>${av(c.n)}<span class="grow"><span class="t">${c.n}</span><br><span class="s">${c.plan} · ${c.week}</span></span></button>`).join('')}</div></div>
+ <div class="card"><h3 class="h3">To do</h3>
+  ${CLIENTS.slice(0,3).flatMap(c=>c.tasks.map(t=>`<label class="check"><input type="checkbox" data-done><span><span class="strike">${t}</span><br><span class="xs">${c.n}</span></span></label>`)).join('')}</div>
+ <div class="card"><h3 class="h3">Your booking link</h3><span class="s">Put it in your Instagram bio. Clients book and pay here, not on WhatsApp.</span>
+  <div class="link-box"><span id="blink">connect.app/priya-nutrition</span><button class="btn sm" id="copy">Copy</button></div></div>`};}
 
-function proClients(){const P=PROS[S.pro];return{title:'Clients',html:`
- <input class="search" id="csearch" placeholder="Search clients" aria-label="Search clients">
- <div class="card"><div class="list">${P.clients.map((c,i)=>`<button class="item" data-client="${i}">${av(c.n)}<span class="grow"><span class="t">${c.n}</span><br><span class="s">${c.plan}</span></span>${statusPill(c.status)}</button>`).join('')}
- ${['Nikita Bhatt','Harsh Trivedi','Pooja Menon'].map(n=>`<div class="item">${av(n)}<span class="grow"><span class="t">${n}</span><br><span class="s">Last session 2 weeks ago</span></span><span class="pill good">On track</span></div>`).join('')}</div></div>
- <span class="s center">+ 18 more clients</span>`};}
+function proClients(){const f=S.cFilter;const list=CLIENTS.filter(c=>f==='All'||c.status===f);
+ return{title:'Clients',html:`
+ <input class="in" id="csearch" placeholder="Search by name or goal" aria-label="Search clients">
+ <div class="chips">${['All','Check-in due','Not logging','New','On track'].map(c=>`<button class="chip" data-cfilter="${c}" aria-pressed="${f===c}">${c}</button>`).join('')}</div>
+ <div class="card"><div class="list" id="clist">${list.length?list.map(c=>`<button class="item" data-client="${CLIENTS.indexOf(c)}">${av(c.n)}<span class="grow"><span class="t">${c.n}</span><br><span class="s">${c.goal}</span><br><span class="xs">${c.plan} · ${c.week}</span></span>${statusPill(c.status)}</button>`).join(''):'<span class="s">No clients in this group.</span>'}</div></div>
+ <span class="s center">Showing ${list.length} of 24 clients</span>`};}
 
-function proClient(i){const c=PROS[S.pro].clients[i];return{title:c.n,back:true,html:`
- <div class="row">${av(c.n,true)}<div class="grow"><div class="t">${c.plan}</div><div class="s">Next session today at ${c.time}</div><div style="margin-top:6px">${statusPill(c.status)}</div></div></div>
- <div class="row" style="gap:8px"><button class="btn sm" id="joinCall">Start video call</button><button class="btn sm ghost" id="msg">Message</button></div>
- <div class="card"><h3 class="h3">Progress · ${PROS[S.pro].metric}</h3>${chart(c.data,PROS[S.pro].metric)}</div>
- <div class="card"><h3 class="h3">Tasks</h3>${c.tasks.map(t=>`<label class="check"><input type="checkbox"><span>${t}</span></label>`).join('')}</div>
- <div class="card"><h3 class="h3">Session notes</h3><span class="s">Private to you</span>
-  <div class="field"><input id="noteIn" placeholder="Add a note from today"><button class="btn sm" id="addNote" data-i="${i}">Add</button></div>
-  <div id="notes" style="display:flex;flex-direction:column;gap:8px">${c.notes.map(([d,t])=>`<div class="note"><div class="s">${d}</div>${esc(t)}</div>`).join('')}</div></div>
- <div class="card"><h3 class="h3">Files</h3>${c.files.length?c.files.map(f=>`<div class="row"><span class="pill blue">FILE</span><span class="grow">${f}</span></div>`).join(''):'<span class="s">No files yet. Ask the client to upload them in the app.</span>'}</div>
- <div class="card"><h3 class="h3">Payments</h3><div class="sep"><span>${c.plan.split(' · ')[0]}</span><span class="pill good">Paid</span></div><span class="s">Invoice with GST sent automatically</span></div>`};}
+function proClient(i){const c=CLIENTS[i],T=S.cTab;let inner='';
+ if(T==='Overview')inner=`
+  <div class="stats"><div class="stat"><span class="xs">Start</span><b>${c.start} kg</b></div><div class="stat"><span class="xs">Now</span><b>${c.now} kg</b></div><div class="stat"><span class="xs">Goal</span><b>${c.target} kg</b></div></div>
+  <div class="card"><div class="row"><h3 class="h3 grow">Weight</h3>${c.start>c.now?`<span class="pill good">−${(c.start-c.now).toFixed(1)} kg</span>`:''}</div>${chart(c.data,'kg',c.target)}
+   <div class="sep"><span class="s">BMI</span><span>${bmi(c)}</span></div><div class="sep"><span class="s">Waist</span><span>${c.waist}</span></div></div>
+  <div class="card"><div class="sep"><h3 class="h3">Followed the plan this week</h3><span class="t">${c.adh}%</span></div><div class="bar"><i style="width:${c.adh}%;background:${c.adh<60?'var(--bad)':'var(--good)'}"></i></div><span class="xs">From meals ticked and food photos</span></div>
+  <div class="card"><h3 class="h3">About</h3><div class="sep"><span class="s">Goal</span><span>${c.goal}</span></div><div class="sep"><span class="s">Age, height</span><span>${c.age}, ${c.height} cm</span></div><div class="sep"><span class="s">Food</span><span>${c.food}</span></div><div class="sep"><span class="s">Health</span><span>${c.cond}</span></div></div>
+  <div class="card"><h3 class="h3">Tasks</h3>${c.tasks.length?c.tasks.map(t=>`<label class="check"><input type="checkbox" data-done><span><span class="strike">${t}</span></span></label>`).join(''):'<span class="s">Nothing pending.</span>'}</div>
+  <div class="card"><div class="sep"><h3 class="h3">Payment</h3><span class="pill good">GST invoice sent</span></div><span class="s">${c.paid}</span><button class="btn ghost" id="renew">Offer next plan</button></div>`;
+ if(T==='Diet plan'){const tp=TEMPLATES[c.n==='Meera Joshi'?1:c.cond.includes('diabetes')?2:0];inner=`
+  <div class="card"><div class="row"><span class="grow"><span class="t">${tp.n}</span><br><span class="s">About ${tp.k.toLocaleString('en-IN')} kcal a day · updated 31 Oct</span></span></div>
+  ${tp.meals.map(([m,t,items])=>`<div class="meal"><div class="mh"><span class="t">${m}</span><span class="xs">${t}</span></div><ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>
+  <button class="btn" data-template="${TEMPLATES.indexOf(tp)}" data-for="${esc(c.n)}">Edit this plan</button>`;}
+ if(T==='Food log')inner=c.log.length?c.log.map(([m,t,d,st])=>`<div class="card"><div class="row"><span class="photo" style="background:${tint(d)}">Food<br>photo</span><span class="grow"><span class="t">${m}</span> <span class="xs">${t}</span><br><span class="s">${d}</span></span>${st==='ok'?'<span class="pill good">On plan</span>':'<span class="pill warn">Off plan</span>'}</div><div class="field"><input class="in" placeholder="Reply to this meal" aria-label="Comment on ${m}"><button class="btn sm" data-comment>Send</button></div></div>`).join(''):`<div class="card center"><span class="t">No food logged yet</span><span class="s">${c.status==='New'?'Logging starts after the first session.':'Send a reminder to log meals.'}</span><button class="btn ghost" data-remind>Send reminder on WhatsApp</button></div>`;
+ if(T==='Notes')inner=`<div class="card"><span class="s">Private to you. Clients never see these.</span>
+  <div class="field"><input class="in" id="noteIn" placeholder="Add a note from today"><button class="btn sm" id="addNote" data-i="${i}">Save</button></div>
+  ${c.notes.map(([d,t])=>`<div class="note"><div class="xs">${d}</div>${esc(t)}</div>`).join('')}</div>`;
+ if(T==='Files')inner=`<div class="card">${c.files.map(f=>`<div class="row"><span class="pill blue">PDF</span><span class="grow">${f}</span><span class="xs">Shared by client</span></div>`).join('')}<button class="btn ghost" data-ask>Ask for a new report</button></div>`;
+ return{title:c.n,back:true,html:`
+ <div class="row">${av(c.n,true)}<div class="grow"><div class="t">${c.plan}</div><div class="s">${c.week}${c.time?' · Session today '+c.time:''}</div><div style="margin-top:4px">${statusPill(c.status)}</div></div></div>
+ <div class="row"><button class="btn sm" data-call>Video call</button><button class="btn sm ghost" data-chat="${esc(c.n)}">Message</button></div>
+ <div class="seg" role="group" aria-label="Client sections">${['Overview','Diet plan','Food log','Notes','Files'].map(t=>`<button data-ctab="${t}" aria-pressed="${T===t}">${t}</button>`).join('')}</div>${inner}`};}
 
-function proServices(){const P=PROS[S.pro];return{title:'My services',html:`
- <span class="s">What clients can buy from you. Packages and monthly plans bring steady income.</span>
- ${P.services.map(s=>`<div class="svc"><div class="row"><span class="t grow">${s.name}</span><span class="price">${rs(s.price)}</span></div><div class="row"><span class="pill blue">${s.type}</span><span class="s">${s.dur}</span></div></div>`).join('')}
- <div class="card"><h3 class="h3">Add a service</h3>
-  <div class="field"><input id="svcName" placeholder="Name, e.g. Group webinar"></div>
-  <div class="field"><input id="svcPrice" inputmode="numeric" placeholder="Price in ₹"><button class="btn sm" id="addSvc">Add</button></div></div>`};}
+function proPlans(){return{title:'Diet plans',html:`
+ <span class="s">Start from a template, change it for each client, and send it in one tap. Clients see it in their app, not as a PDF lost in WhatsApp.</span>
+ ${TEMPLATES.map((t,i)=>`<button class="card" data-template="${i}"><div class="row"><span class="grow"><span class="t">${t.n}</span><br><span class="s">${t.meals.length} meals · about ${t.k.toLocaleString('en-IN')} kcal</span></span><span class="pill blue">${t.tag}</span></div></button>`).join('')}
+ <button class="btn ghost" data-template="0">Create a new plan</button>`};}
+
+function proBuilder(){const p=S.plan;const kcal=p.k+p.extra*80;return{title:'Plan builder',back:true,html:`
+ <div class="card"><div class="row"><span class="grow"><span class="t">${p.n}</span><br><span class="s">About ${kcal.toLocaleString('en-IN')} kcal a day</span></span><span class="pill blue">${p.tag}</span></div></div>
+ ${p.meals.map(([m,t,items],mi)=>`<div class="card"><div class="mh row"><span class="t grow">${m}</span><span class="xs">${t}</span></div>
+  ${items.map((x,xi)=>`<div class="row"><span class="grow">${esc(x)}</span><button class="chip" data-rm="${mi}-${xi}" aria-label="Remove ${esc(x)}">Remove</button></div>`).join('')}
+  <div class="field"><input class="in" id="add-${mi}" placeholder="Add food, e.g. Buttermilk"><button class="btn sm" data-addfood="${mi}">Add</button></div></div>`).join('')}
+ <div class="card"><h3 class="h3">Send to</h3><select class="in" id="planFor">${CLIENTS.map(c=>`<option ${c.n===S.planFor?'selected':''}>${c.n}</option>`).join('')}</select>
+  <button class="btn" id="assign">Send plan to client</button><span class="xs">They get it in the app with a WhatsApp alert.</span></div>`};}
 
 function proCal(){const hrs=['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00'],days=['Mon','Tue','Wed','Thu','Fri'];
- const booked=new Set(['1-1','2-4','4-1','4-3','4-7','0-6','3-2']);const closed=new Set(['0-0','2-0','3-8','1-8']);
+ const booked=new Set(['1-1','2-4','4-1','4-3','4-7','0-6','3-2']),closed=new Set(['0-0','2-0','3-8','1-8']);
  return{title:'Availability',html:`
  <span class="s">Tap a slot to open or close it. Clients only see open slots.</span>
  <div class="legend"><span><i style="background:var(--accent-soft)"></i>Open</span><span><i style="background:var(--saffron)"></i>Booked</span><span><i style="background:var(--surface-2);border:1px solid var(--line)"></i>Closed</span></div>
  <div class="card" style="overflow-x:auto"><div class="week"><span></span>${days.map((d,i)=>`<span class="hd">${d}<br>${10+i}</span>`).join('')}
  ${hrs.map((h,hi)=>`<span class="hr">${h}</span>`+days.map((d,di)=>{const k=di+'-'+hi;return booked.has(k)?`<button class="cell booked" disabled aria-label="${d} ${h} booked">Booked</button>`:`<button class="cell ${closed.has(k)?'':'open'}" data-cell aria-label="${d} ${h}">${closed.has(k)?'':'Open'}</button>`}).join('')).join('')}
  </div></div>
- <div class="card"><div class="sep"><span>Session length</span><span class="t">45 min</span></div><div class="sep"><span>Break between sessions</span><span class="t">15 min</span></div><div class="sep"><span>Reminders to clients</span><span class="t">WhatsApp + email</span></div></div>`};}
+ <div class="card"><div class="sep"><span>Session length</span><span class="t">45 min</span></div><div class="sep"><span>Break between sessions</span><span class="t">15 min</span></div><div class="sep"><span>Chat office hours</span><span class="t">10:00 to 19:00</span></div><div class="sep"><span>Reminders to clients</span><span class="t">WhatsApp + email</span></div><div class="sep"><span>Clinic days</span><span class="t">Tue, Thu</span></div></div>`};}
 
-/* ---------- Client views ---------- */
-function cExplore(){const cats=['All','Health','Finance','Career','Legal','Home','Business'];
- const q=S.q.toLowerCase();const list=EXPERTS.filter(e=>(S.cat==='All'||e.cat===S.cat)&&(!q||(e.n+e.f+e.city+e.lang+e.about).toLowerCase().includes(q)));
- return{title:'Find an expert',html:`
- <input class="search" id="q" placeholder="Try: tax, PCOS, resume, Gujarati" value="${esc(S.q)}" aria-label="Search experts">
- <div class="chips">${cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${S.cat===c}">${c}</button>`).join('')}</div>
- ${list.length?list.map(e=>`<button class="card" style="text-align:left" data-expert="${EXPERTS.indexOf(e)}"><div class="row">${av(e.n)}<span class="grow"><span class="t">${e.n}</span><br><span class="s">${e.f} · ${e.city}</span></span><span class="s">★ ${e.rating}</span></div><span class="s">${e.about}</span><div class="row"><span class="pill blue">From ${rs(e.from)}</span><span class="s grow">${e.lang}</span></div></button>`).join(''):'<div class="card center"><span class="t">No experts match that yet</span><span class="s">Try another word or pick "All".</span></div>'}`};}
+function proMore(){return{title:'My business',html:`
+ <div class="card"><div class="row"><h3 class="h3 grow">Earnings</h3><span class="pill good">+18% vs Oct</span></div>${bars([52000,61000,58000,67500,71500,84500],['Jun','Jul','Aug','Sep','Oct','Nov'])}
+  <div class="sep"><span class="s">Next payout to bank</span><span class="t">${rs(21400)} on 10 Nov</span></div><div class="sep"><span class="s">Invoices this month</span><span>31, with GST</span></div></div>
+ <div class="card"><div class="row"><h3 class="h3 grow">My services</h3><span class="xs">${S.svcs.length}</span></div>
+  ${S.svcs.map(s=>`<div class="row"><span class="grow"><span class="t">${s.name}</span><br><span class="xs">${s.type} · ${s.dur}</span></span><span class="price">${rs(s.price)}</span></div>`).join('')}
+  <div class="field"><input class="in" id="svcName" placeholder="New service name"></div>
+  <div class="field"><input class="in" id="svcPrice" inputmode="numeric" placeholder="Price in ₹"><button class="btn sm" id="addSvc">Add</button></div></div>
+ <div class="card"><div class="row"><h3 class="h3 grow">Group class</h3><span class="pill blue">34 of 50 seats</span></div><span class="t">PCOS and food: what to eat in a week</span><span class="s">Sat 15 Nov · 11:00 · ₹199 each · ${rs(34*199)} so far</span><button class="btn ghost" data-share>Share class link</button></div>
+ <div class="card"><div class="row"><h3 class="h3 grow">Reviews</h3><span class="stars">★★★★★</span><span class="t">4.9</span></div>
+  <div class="note"><div class="xs">Ananya P. · 2 weeks ago</div>Lost 4 kg without giving up rotli and dal. Plan, photos and chat all in one place.</div>
+  <div class="note"><div class="xs">Riddhi S. · 1 month ago</div>My cycles are regular again after 3 months. Very patient.</div></div>
+ <div class="card"><h3 class="h3">Settings</h3><div class="sep"><span>Qualification shown</span><span class="t">M.Sc. Nutrition, RD</span></div><div class="sep"><span>GST number</span><span class="t">24ABCDE1234F1Z5</span></div><div class="sep"><span>Plan</span><span class="t">Connect Pro · ₹499/mo</span></div></div>`};}
 
-function cExpert(i){const e=EXPERTS[i];const svcs=e.pro?PROS[e.pro].services:GENERIC_SVC(e);
- return{title:e.n,back:true,html:`
- <div class="row">${av(e.n,true)}<div class="grow"><div class="t">${e.f}</div><div class="s">${e.city} · ${e.lang}</div><div class="s">★ ${e.rating} (${e.rev} reviews) · <span style="color:var(--good)">Verified</span></div></div></div>
+/* ---------- Shared chat ---------- */
+function chatView(who){const msgs=S.chats[who]||(S.chats[who]=[]);const meIsPro=S.mode==='pro';
+ return{title:who,back:true,chat:who,html:`<div class="center xs">Chat hours 10:00 to 19:00 · Replies usually within 2 hours</div>
+ ${msgs.map(([f,t])=>{const mine=meIsPro?f==='me':f==='them';return `<div class="bubble ${mine?'me':'them'}">${esc(t)}</div>`}).join('')}`};}
+
+/* ---------- User views ---------- */
+function uHome(){return{title:'Hi Ananya',html:`
+ <div class="card" style="background:var(--accent-soft);border-color:transparent"><div class="row"><span class="grow"><span class="xs">Next session</span><br><span class="t">${S.mine[0].what} with ${S.mine[0].who}</span><br><span class="s">${S.mine[0].when}</span></span><button class="btn sm" data-go="me">View</button></div></div>
+ <h3 class="h3">What do you need help with?</h3>
+ <div class="boxes">${GOALS.map((g,i)=>`<button class="box" data-goal="${g.id}" style="background:${TINTS[i%6]}"><span class="bn">${g.n}</span><span class="bl">${g.l}</span></button>`).join('')}</div>
+ <h3 class="h3">Ways to consult</h3>
+ <div class="ways">${WAYS.map(w=>`<button class="way" data-go="find"><span class="t">${w.n}</span><span class="xs">${w.l}</span></button>`).join('')}</div>
+ <h3 class="h3">Top rated near you</h3>
+ ${NUTS.slice(0,2).map(nutCard).join('')}`};}
+
+function nutCard(e){const i=NUTS.indexOf(e);const from=Math.min(...e.svcs.map(s=>s.price));
+ return `<button class="card" data-nut="${i}"><div class="row">${av(e.n)}<span class="grow"><span class="t">${e.n}</span><br><span class="s">${e.city} · ${e.mode} · ${e.exp} yrs</span></span><span class="s"><span class="stars">★</span> ${e.rating}</span></div>
+ <span class="s">${e.about}</span><div class="row wrap"><span class="pill blue">From ${rs(from)}</span>${e.food.slice(0,2).map(f=>`<span class="pill good">${f}</span>`).join('')}<span class="xs">${e.lang.join(', ')}</span></div></button>`;}
+
+const FF=['Gujarati','Hindi','Jain food','Under ₹1,000','Clinic visit'];
+function filterNuts(){const q=S.q.toLowerCase(),F=S.fFilters;return NUTS.filter(e=>{
+ if(S.goal&&!e.goals.includes(S.goal))return false;
+ if(q&&!(e.n+e.city+e.about+e.lang.join()+e.goals.map(g=>GOALS.find(x=>x.id===g).n).join()).toLowerCase().includes(q))return false;
+ if(F.has('Gujarati')&&!e.lang.includes('Gujarati'))return false;
+ if(F.has('Hindi')&&!e.lang.includes('Hindi'))return false;
+ if(F.has('Jain food')&&!e.food.includes('Jain'))return false;
+ if(F.has('Under ₹1,000')&&Math.min(...e.svcs.map(s=>s.price))>=1000)return false;
+ if(F.has('Clinic visit')&&!e.mode.includes('clinic'))return false;return true;});}
+function uFind(fromGoal){const g=GOALS.find(x=>x.id===S.goal);const list=filterNuts();
+ return{title:g?g.n:'Find a nutritionist',back:!!fromGoal,html:`
+ ${g?`<div class="card" style="background:${TINTS[GOALS.indexOf(g)%6]};border-color:transparent"><span class="t">${g.n}</span><span class="s">${g.l}</span><span class="xs">You get: a plan for your food habits, weekly check-ins, progress tracking and chat with your nutritionist.</span></div>`:''}
+ <input class="in" id="q" placeholder="Search: PCOS, Jain, Gujarati, Surat" value="${esc(S.q)}" aria-label="Search nutritionists">
+ <div class="chips">${!fromGoal?`<button class="chip" data-goalclear aria-pressed="${!S.goal}">All goals</button>`:''}${FF.map(f=>`<button class="chip" data-ff="${f}" aria-pressed="${S.fFilters.has(f)}">${f}</button>`).join('')}</div>
+ <span class="xs">${list.length} nutritionist${list.length===1?'':'s'}, all verified</span>
+ ${list.length?list.map(nutCard).join(''):'<div class="card center"><span class="t">No one matches all of these</span><span class="s">Remove a filter to see more.</span></div>'}`};}
+
+function uNut(i){const e=NUTS[i];return{title:e.n,back:true,html:`
+ <div class="row">${av(e.n,true)}<div class="grow"><div class="t">Nutritionist · ${e.exp} years</div><div class="s">${e.city} · ${e.mode}</div><div class="s"><span class="stars">★</span> ${e.rating} (${e.rev} reviews) · <span style="color:var(--good);font-weight:600">Verified</span></div></div></div>
  <p style="margin:0">${e.about}</p>
+ <div class="row wrap">${e.goals.map(g=>`<span class="pill blue">${GOALS.find(x=>x.id===g).n}</span>`).join('')}</div>
+ <div class="card"><div class="sep"><span class="s">Languages</span><span>${e.lang.join(', ')}</span></div><div class="sep"><span class="s">Food plans</span><span>${e.food.join(', ')}</span></div></div>
+ <button class="btn ghost" data-intro="${i}">Book a free 10 min intro call</button>
  <h3 class="h3">Choose a service</h3>
- ${svcs.map((s,si)=>`<button class="svc" data-svc="${si}"><div class="row"><span class="t grow">${s.name}</span><span class="price">${rs(s.price)}</span></div><div class="row"><span class="pill blue">${s.type}</span><span class="s">${s.dur}</span></div></button>`).join('')}
- <div class="card"><h3 class="h3">What clients say</h3><div class="note"><div class="s">★★★★★ · 2 weeks ago</div>Very clear and patient. Everything was in the app, so I never lost a file or a plan.</div></div>`};}
+ ${e.svcs.map((s,si)=>`<button class="svc" data-svc="${si}"><div class="row"><span class="t grow">${s.name}</span><span class="price">${rs(s.price)}</span></div><div class="row"><span class="pill blue">${s.type}</span><span class="s">${s.dur}</span></div></button>`).join('')}
+ <div class="card"><h3 class="h3">What clients say</h3><div class="note"><div class="xs"><span class="stars">★★★★★</span> · 2 weeks ago</div>Food I actually eat at home, not a boring chart. Everything is in the app.</div></div>`};}
 
-function cBook(){const b=S.booking,e=EXPERTS[b.e],s=(e.pro?PROS[e.pro].services:GENERIC_SVC(e))[b.s];
- const days=[['Mon',10],['Tue',11],['Wed',12],['Thu',13],['Fri',14]],slots=['10:00','11:00','12:30','15:00','17:00','18:30'],full=new Set(['11:00','15:00']);
+const svcOf=b=>b.intro?{name:'Free intro call',type:'Intro',dur:'10 min',price:0}:NUTS[b.e].svcs[b.s];
+const DN=['Mon','Tue','Wed','Thu','Fri'];
+function uBook(){const b=S.booking,e=NUTS[b.e],s=svcOf(b);const slots=['10:00','11:00','12:30','15:00','17:00','18:30'],full=new Set(['11:00','15:00']);
  return{title:'Pick a time',back:true,html:`
- <div class="card"><div class="row"><span class="grow"><span class="t">${s.name}</span><br><span class="s">with ${e.n}</span></span><span class="price">${rs(s.price)}</span></div></div>
+ <div class="card"><div class="row"><span class="grow"><span class="t">${s.name}</span><br><span class="s">with ${e.n} · ${s.dur}</span></span><span class="price">${s.price?rs(s.price):'Free'}</span></div></div>
  <div class="label">November</div>
- <div class="days">${days.map(([d,n])=>`<button class="day" data-day="${n}" aria-pressed="${b.day===n}">${d}<b>${n}</b></button>`).join('')}</div>
+ <div class="days">${DN.map((d,i)=>`<button class="day" data-day="${10+i}" aria-pressed="${b.day===10+i}">${d}<b>${10+i}</b></button>`).join('')}</div>
  <div class="label">Open slots</div>
  <div class="slots">${slots.map(t=>`<button class="slot" data-slot="${t}" ${full.has(t)?'disabled':''} aria-pressed="${b.slot===t}">${t}</button>`).join('')}</div>
- <button class="btn" id="toPay" ${b.slot?'':'disabled style="opacity:.5"'}>Continue to pay ${rs(s.price)}</button>`};}
+ <button class="btn" id="toIntake" ${b.slot?'':'disabled'}>Continue</button>`};}
 
-function cPay(){const b=S.booking,e=EXPERTS[b.e],s=(e.pro?PROS[e.pro].services:GENERIC_SVC(e))[b.s];const gst=Math.round(s.price*0.18);
+function uIntake(){const b=S.booking,e=NUTS[b.e];const I=b.intake;
+ return{title:'About you',back:true,html:`
+ <span class="s">This helps ${e.n.replace('Dr. ','').split(' ')[0]} prepare. Only your nutritionist sees it.</span>
+ <div class="card"><label class="t" for="iGoal">Main goal</label><select class="in" id="iGoal">${GOALS.map(g=>`<option ${g.id===(S.goal||'wl')?'selected':''}>${g.n}</option>`).join('')}</select>
+  <div class="row"><div class="grow"><label class="xs" for="iH">Height (cm)</label><input class="in" id="iH" inputmode="numeric" value="162"></div><div class="grow"><label class="xs" for="iW">Weight (kg)</label><input class="in" id="iW" inputmode="decimal" value="74"></div></div></div>
+ <div class="card"><span class="t">What do you eat?</span><div class="row wrap">${['Veg','Jain','Eggetarian','Non-veg','Vegan'].map(f=>`<button class="chip" data-food="${f}" aria-pressed="${I.food===f}">${f}</button>`).join('')}</div></div>
+ <div class="card"><span class="t">Any health conditions?</span>${['PCOS / PCOD','Thyroid','Diabetes','High BP','None'].map(c=>`<label class="check"><input type="checkbox" ${c==='None'?'checked':''}><span>${c}</span></label>`).join('')}</div>
+ <div class="card"><label class="t" for="iNote">Anything else?</label><textarea class="in" id="iNote" placeholder="e.g. I work night shifts, I don't like karela"></textarea>
+  <button class="btn ghost" data-upload>Upload blood report (optional)</button></div>
+ <button class="btn" id="toPay">${svcOf(b).price?'Continue to pay':'Confirm booking'}</button>`};}
+
+function uPay(){const b=S.booking,e=NUTS[b.e],s=svcOf(b);const gst=Math.round(s.price*.18);
  return{title:'Pay',back:true,html:`
  <div class="card"><div class="sep"><span>${s.name}</span><span>${rs(s.price)}</span></div><div class="sep"><span class="s">GST 18%</span><span class="s">${rs(gst)}</span></div><div class="sep t"><span>Total</span><span class="price">${rs(s.price+gst)}</span></div>
- <span class="s">${['Mon','Tue','Wed','Thu','Fri'][b.day-10]}, ${b.day} Nov at ${b.slot} · Video call</span></div>
+ <span class="s">${DN[b.day-10]} ${b.day} Nov at ${b.slot} · Video call with ${e.n}</span></div>
  <div class="label">Pay with UPI</div>
  <div class="upi">${['GPay','PhonePe','Paytm'].map(u=>`<button data-upi="${u}" aria-pressed="${b.upi===u}">${u}</button>`).join('')}</div>
+ ${s.price>=5000?`<div class="card"><label class="check"><input type="checkbox" id="parts"><span>Pay in 3 parts of ${rs((s.price+gst)/3)}</span></label></div>`:''}
  <button class="btn" id="payNow">Pay ${rs(s.price+gst)}</button>
- <span class="s center">Demo only. No money moves.</span>`};}
+ <span class="xs center">Demo only. No money moves.</span>`};}
 
-function cDone(){const b=S.booking,e=EXPERTS[b.e];return{title:'Booked',html:`
- <div class="big-ok" aria-hidden="true">✓</div>
- <div class="center"><div class="h3" style="font-size:20px">You're booked with ${e.n}</div><div class="s">${['Mon','Tue','Wed','Thu','Fri'][b.day-10]}, ${b.day} Nov at ${b.slot}</div></div>
- <div class="card"><div class="sep"><span>Video call link</span><span class="t">In the app</span></div><div class="sep"><span>Reminder</span><span class="t">WhatsApp, 1 hour before</span></div><div class="sep"><span>Invoice</span><span class="t">Sent to email</span></div></div>
- <div class="card"><h3 class="h3">Before the session</h3><span class="s">Fill in a short form so ${e.n.split(' ')[0]==='CA'||e.n.startsWith('Adv.')||e.n.startsWith('Dr.')?e.n.split(' ')[1]:e.n.split(' ')[0]} can prepare.</span><button class="btn ghost" id="intake">Fill intake form</button></div>
- <button class="btn" data-go="mine">Go to My space</button>`};}
+function uDone(){const b=S.booking,e=NUTS[b.e];return{title:'Booked',html:`
+ <div class="big-ok" aria-hidden="true">${IC.ok}</div>
+ <div class="center"><div class="h3" style="font-size:19px">You're booked with ${e.n}</div><div class="s">${DN[b.day-10]} ${b.day} Nov at ${b.slot}</div></div>
+ <div class="card"><div class="sep"><span>Video call link</span><span class="t">In the app</span></div><div class="sep"><span>Reminder</span><span class="t">WhatsApp, 1 hour before</span></div><div class="sep"><span>Invoice</span><span class="t">${svcOf(b).price?'Sent to email':'No charge'}</span></div><div class="sep"><span>Your intake form</span><span class="t">Shared</span></div></div>
+ <button class="btn" data-go="me">See my sessions</button>`};}
 
-function cMine(){return{title:'My space',html:`
- <div class="card"><h3 class="h3">Upcoming</h3><div class="list">${S.mine.map(m=>`<div class="item">${av(m.who)}<span class="grow"><span class="t">${m.who}</span><br><span class="s">${m.what}</span><br><span class="s">${m.when}</span></span></div>`).join('')}</div></div>
- <div class="card"><div class="row"><h3 class="h3 grow">My progress · Weight</h3><span class="pill good">−${(S.myWeights[0]-S.myWeights.at(-1)).toFixed(1)} kg</span></div>${chart(S.myWeights,'Weight (kg)')}
-  <div class="field"><input id="wIn" inputmode="decimal" placeholder="Log today's weight (kg)"><button class="btn sm" id="logW">Log</button></div></div>
- <div class="card"><h3 class="h3">Tasks from Priya</h3>${S.myTasks.map(([t,d],i)=>`<label class="check"><input type="checkbox" data-mytask="${i}" ${d?'checked':''}><span>${t}</span></label>`).join('')}</div>
- <div class="card"><h3 class="h3">My documents</h3><div class="row"><span class="pill blue">FILE</span><span class="grow">Week 7 diet plan.pdf</span></div><div class="row"><span class="pill blue">FILE</span><span class="grow">Blood report Oct.pdf</span></div><div class="row"><span class="pill blue">FILE</span><span class="grow">ITR acknowledgement 2026.pdf</span></div><span class="s">Shared only with the experts you choose.</span></div>`};}
+function uPlan(){const tp=TEMPLATES[0];const done=S.mealsDone.size,tot=tp.meals.length;
+ return{title:'My plan · Fri 7 Nov',html:`
+ <div class="card"><div class="sep"><span class="t">Today</span><span class="s">${done} of ${tot} meals done</span></div><div class="bar"><i style="width:${done/tot*100}%"></i></div></div>
+ <div class="card"><div class="sep"><span class="t">Water</span><span class="s">${S.water} of 8 glasses</span></div><div class="glasses">${Array.from({length:8},(_,i)=>`<button class="glass" data-water="${i+1}" aria-pressed="${i<S.water}" aria-label="${i+1} glasses"></button>`).join('')}</div></div>
+ <div class="card"><div class="row"><span class="grow"><span class="t">${tp.n}</span><br><span class="xs">From Priya Mehta · updated 31 Oct</span></span></div>
+ ${tp.meals.map(([m,t,items])=>`<div class="meal"><label class="check"><input type="checkbox" data-meal="${m}" ${S.mealsDone.has(m)?'checked':''}><span class="grow"><span class="mh"><span class="t strike">${m}</span><span class="xs">${t}</span></span><span class="s">${items.join(' · ')}</span></span></label><div class="row"><button class="chip" data-photo="${m}">Add photo</button><button class="chip" data-swap="${m}">Ask for a swap</button></div></div>`).join('')}</div>
+ <div class="card"><h3 class="h3">Tips from Priya</h3><div class="note">Eating out this weekend? Pick dal, roti and a salad first. Skip the fried starters.</div></div>`};}
+
+function uProgress(){const w=S.myWeights,c=S.checkin;return{title:'My progress',html:`
+ <div class="stats"><div class="stat"><span class="xs">Start</span><b>${w[0]} kg</b></div><div class="stat"><span class="xs">Now</span><b>${w.at(-1)} kg</b></div><div class="stat"><span class="xs">Goal</span><b>70 kg</b></div></div>
+ <div class="card"><div class="row"><h3 class="h3 grow">Weight</h3><span class="pill good">−${(w[0]-w.at(-1)).toFixed(1)} kg</span></div>${chart(w,'kg',70)}
+  <div class="field"><input class="in" id="wIn" inputmode="decimal" placeholder="Today's weight (kg)" aria-label="Today's weight"><button class="btn sm" id="logW">Log</button></div></div>
+ <div class="card"><div class="sep"><h3 class="h3">Waist</h3><span class="t">84 → 79 cm</span></div><div class="sep"><span class="s">BMI</span><span>${(w.at(-1)/(1.62**2)).toFixed(1)}</span></div><div class="sep"><span class="s">Plan followed this week</span><span>86%</span></div></div>
+ <div class="card"><h3 class="h3">Weekly check-in</h3><span class="s">Priya reads this before your next session.</span>
+  <span class="t">Energy this week</span><div class="scale">${[1,2,3,4,5].map(n=>`<button data-energy="${n}" aria-pressed="${c.energy===n}">${n}</button>`).join('')}</div>
+  <span class="t">Hunger between meals</span><div class="scale">${[1,2,3,4,5].map(n=>`<button data-hunger="${n}" aria-pressed="${c.hunger===n}">${n}</button>`).join('')}</div>
+  <textarea class="in" id="ckNote" placeholder="How did the week go?"></textarea><button class="btn" id="sendCk">Send check-in</button></div>`};}
+
+function uMe(){return{title:'Me',html:`
+ <div class="card"><h3 class="h3">Upcoming sessions</h3><div class="list">${S.mine.map(m=>`<div class="item">${av(m.who)}<span class="grow"><span class="t">${m.what}</span><br><span class="s">${m.who} · ${m.when}</span></span><button class="btn sm" data-call>Join</button></div>`).join('')}</div></div>
+ <div class="card"><h3 class="h3">My nutritionist</h3><div class="row">${av('Priya Mehta')}<span class="grow"><span class="t">Priya Mehta</span><br><span class="s">12-week weight loss · Week 7 of 12</span></span><button class="btn sm ghost" data-chat="Priya Mehta">Chat</button></div></div>
+ <div class="card"><h3 class="h3">Past sessions</h3><div class="note"><div class="xs">3 Nov · Week 7 check-in</div>Summary: good week, keep walks. Add one more protein snack. Next: try millet rotli twice a week.</div></div>
+ <div class="card"><h3 class="h3">My documents</h3>${['Blood report, Oct.pdf','Week 7 diet plan.pdf','Thyroid test, Aug.pdf'].map(f=>`<div class="row"><span class="pill blue">PDF</span><span class="grow">${f}</span></div>`).join('')}<span class="xs">Shared only with the experts you choose.</span><button class="btn ghost" data-upload>Upload a report</button></div>
+ <div class="card"><h3 class="h3">Payments</h3><div class="sep"><span>12-week weight loss plan</span><span>${rs(9439)}</span></div><span class="xs">Paid 19 Sep · GST invoice in your email</span></div>`};}
 
 /* ---------- Render ---------- */
-const PRO_TABS=[['home','Home',IC.home],['clients','Clients',IC.users],['services','Services',IC.tag],['cal','Calendar',IC.cal]];
-const C_TABS=[['explore','Explore',IC.search],['mine','My space',IC.me]];
+const PRO_TABS=[['home','Home',IC.home],['clients','Clients',IC.users],['plans','Plans',IC.plan],['cal','Calendar',IC.cal],['more','Business',IC.more]];
+const U_TABS=[['home','Home',IC.home],['find','Find',IC.search],['plan','My plan',IC.meal],['progress','Progress',IC.chart],['me','Me',IC.me]];
+const TRY={pro:['Open "Needs your attention" and message Meera','Open Ananya, then the Diet plan and Food log tabs','Plans: open a template, add a food, send it to a client','Business: earnings, services, group class, reviews'],
+ user:['Tap a goal box, like PCOS and PCOD','Open a nutritionist, pick a service, book and pay','My plan: tick meals and fill water glasses','Progress: log your weight and send a check-in']};
 function current(){const top=S.stack.at(-1);
- if(top){const[k,a]=top;return({client:proClient,expert:cExpert,book:cBook,pay:cPay,done:cDone})[k](a);}
- if(S.mode==='pro')return({home:proHome,clients:proClients,services:proServices,cal:proCal})[S.tab]();
- return({explore:cExplore,mine:cMine})[S.tab]();}
-function render(){
- const v=current();
+ if(top){const[k,a]=top;return({client:proClient,builder:proBuilder,chat:chatView,goal:()=>uFind(true),nut:uNut,book:uBook,intake:uIntake,pay:uPay,done:uDone})[k](a);}
+ if(S.mode==='pro')return({home:proHome,clients:proClients,plans:proPlans,cal:proCal,more:proMore})[S.tab]();
+ return({home:uHome,find:()=>uFind(false),plan:uPlan,progress:uProgress,me:uMe})[S.tab]();}
+function render(keepScroll){const sc=$('view').scrollTop;const v=current();
  $('top').innerHTML=(v.back?'<button class="back" id="back" aria-label="Back">‹</button>':'')+`<h2>${esc(v.title)}</h2>`;
  $('view').innerHTML=v.html;
- const tabs=S.mode==='pro'?PRO_TABS:C_TABS;
- $('tabs').innerHTML=tabs.map(([k,l,i])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${i}${l}</button>`).join('');
- $('prof').innerHTML=Object.entries(PROS).map(([k,p])=>`<button class="chip" data-pro="${k}" aria-pressed="${S.pro===k}">${p.label}</button>`).join('');
- $('profWrap').hidden=S.mode!=='pro';
+ $('chatbar').innerHTML=v.chat?`<div class="chatbar"><input class="in" id="msgIn" placeholder="Type a message" aria-label="Message"><button class="btn sm" id="sendMsg" data-to="${esc(v.chat)}">Send</button></div>`:'';
+ $('tabs').innerHTML=(S.mode==='pro'?PRO_TABS:U_TABS).map(([k,l,i])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${i}${l}</button>`).join('');
+ $('try').innerHTML=TRY[S.mode].map(t=>`<li>${t}</li>`).join('');
  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
-}
-function go(k,a){S.stack.push([k,a]);render();$('view').scrollTop=0}
-function setMode(m){S.mode=m;S.tab=m==='pro'?'home':'explore';S.stack=[];render();try{history.replaceState(null,'','#'+(m==='pro'?'consultant':'client'))}catch(e){}}
+ $('view').scrollTop=v.chat?1e6:keepScroll?sc:0;}
+function go(k,a){S.stack.push([k,a]);render();}
+function setMode(m){S.mode=m;S.tab='home';S.stack=[];S.goal=null;render();try{history.replaceState(null,'','#'+(m==='pro'?'nutritionist':'user'))}catch(e){}}
 
-document.addEventListener('click',ev=>{const t=ev.target.closest('button,[data-cell]');if(!t)return;const d=t.dataset;
+document.addEventListener('click',ev=>{const t=ev.target.closest('button');if(!t)return;const d=t.dataset;
  if(d.mode)return setMode(d.mode);
- if(d.pro){S.pro=d.pro;S.stack=[];return render();}
- if(d.tab){S.tab=d.tab;S.stack=[];render();$('view').scrollTop=0;return;}
- if(t.id==='back'){S.stack.pop();return render();}
- if(d.client!==undefined)return go('client',+d.client);
- if(d.expert!==undefined)return go('expert',+d.expert);
- if(d.svc!==undefined){const e=S.stack.at(-1)[1];S.booking={e,s:+d.svc,day:10,slot:null,upi:'GPay'};return go('book');}
- if(d.day){S.booking.day=+d.day;return render();}
- if(d.slot){S.booking.slot=d.slot;return render();}
- if(t.id==='toPay'&&S.booking.slot)return go('pay');
- if(d.upi){S.booking.upi=d.upi;return render();}
- if(t.id==='payNow'){const b=S.booking,e=EXPERTS[b.e],s=(e.pro?PROS[e.pro].services:GENERIC_SVC(e))[b.s];
-   S.mine.unshift({who:e.n,what:s.name,when:`${['Mon','Tue','Wed','Thu','Fri'][b.day-10]}, ${b.day} Nov · ${b.slot}`});S.stack=[['done']];return render();}
- if(d.go==='mine'){S.tab='mine';S.stack=[];return render();}
- if(t.id==='intake')return toast('The intake form would open here');
- if(t.id==='copy'){const txt=$('blink').textContent;try{navigator.clipboard.writeText(txt).then(()=>toast('Link copied'),()=>toast('Select the link to copy it'))}catch(e){toast('Select the link to copy it')}return;}
- if(t.id==='joinCall')return toast('The video call would open here');
- if(t.id==='msg')return toast('Chat with the client would open here');
- if(t.id==='addNote'){const v=$('noteIn').value.trim();if(!v)return toast('Type a note first');PROS[S.pro].clients[+d.i].notes.unshift(['Today',v]);render();return toast('Note saved');}
- if(t.id==='addSvc'){const n=$('svcName').value.trim(),p=parseInt($('svcPrice').value.replace(/\D/g,''));if(!n||!p)return toast('Add a name and a price');PROS[S.pro].services.push({name:n,type:'New',dur:'Visible to clients now',price:p});render();return toast('Service added');}
+ if(d.tab){S.tab=d.tab;S.stack=[];if(d.tab==='find')S.goal=null;return render();}
+ if(t.id==='back'){S.stack.pop();if(!S.stack.some(x=>x[0]==='goal')&&S.tab!=='find')S.goal=null;return render();}
+ // nutritionist
+ if(d.client!==undefined){S.cTab='Overview';return go('client',+d.client);}
+ if(d.cfilter){S.cFilter=d.cfilter;return render(true);}
+ if(d.ctab){S.cTab=d.ctab;return render(true);}
+ if(d.template!==undefined){const tp=TEMPLATES[+d.template];S.plan={...tp,meals:tp.meals.map(([a,b,c])=>[a,b,c.slice()]),extra:0};if(d.for)S.planFor=d.for;return go('builder');}
+ if(d.rm){const[m,x]=d.rm.split('-').map(Number);S.plan.meals[m][2].splice(x,1);S.plan.extra--;return render(true);}
+ if(d.addfood!==undefined){const i=$('add-'+d.addfood),v=i.value.trim();if(!v)return toast('Type a food first');S.plan.meals[+d.addfood][2].push(v);S.plan.extra++;render(true);return toast('Added '+v);}
+ if(t.id==='assign'){S.planFor=$('planFor').value;S.stack.pop();render();return toast('Plan sent to '+S.planFor);}
  if(d.cell!==undefined){const open=t.classList.toggle('open');t.textContent=open?'Open':'';return;}
- if(t.id==='logW'){const w=parseFloat($('wIn').value);if(!(w>20&&w<300))return toast('Enter a weight in kg');S.myWeights.push(w);if(S.myWeights.length>8)S.myWeights.shift();render();return toast('Logged. Priya can see it too.');}
+ if(t.id==='addNote'){const v=$('noteIn').value.trim();if(!v)return toast('Type a note first');CLIENTS[+d.i].notes.unshift(['Today',v]);render(true);return toast('Note saved');}
+ if(t.id==='addSvc'){const n=$('svcName').value.trim(),p=parseInt($('svcPrice').value.replace(/\D/g,''));if(!n||!p)return toast('Add a name and a price');S.svcs.push({name:n,type:'New',dur:'Visible to clients now',price:p});render(true);return toast('Service added');}
+ if(d.comment!==undefined){const i=t.previousElementSibling;if(!i.value.trim())return toast('Type a reply first');i.value='';return toast('Sent. The client sees it under the meal.');}
+ if(d.remind!==undefined)return toast('Reminder sent on WhatsApp');
+ if(d.ask!==undefined)return toast('Request sent. The client can upload from their phone.');
+ if(t.id==='renew')return toast('Offer sent: 3-month maintenance plan, ₹5,999');
+ if(d.share!==undefined)return toast('Class link copied');
+ if(t.id==='copy'){const txt=$('blink').textContent;try{navigator.clipboard.writeText(txt).then(()=>toast('Link copied'),()=>toast('Select the link to copy it'))}catch(e){toast('Select the link to copy it')}return;}
+ // shared
+ if(d.call!==undefined)return toast('The video call opens here');
+ if(d.chat)return go('chat',d.chat);
+ if(t.id==='sendMsg'){const i=$('msgIn'),v=i.value.trim();if(!v)return;const who=d.to;(S.chats[who]=S.chats[who]||[]).push([S.mode==='pro'?'me':'them',v]);render();
+   if(S.mode==='user'){setTimeout(()=>{S.chats[who].push(['me','Thanks Ananya, noted. I\'ll reply in detail by evening.']);if(S.stack.at(-1)?.[0]==='chat')render();},1200);}return;}
+ // user
+ if(d.goal){S.goal=d.goal;S.fFilters.clear();S.q='';return go('goal');}
+ if(d.goalclear!==undefined){S.goal=null;return render(true);}
+ if(d.ff){S.fFilters.has(d.ff)?S.fFilters.delete(d.ff):S.fFilters.add(d.ff);return render(true);}
+ if(d.nut!==undefined)return go('nut',+d.nut);
+ if(d.intro!==undefined){S.booking={e:+d.intro,intro:true,day:10,slot:null,upi:'GPay',intake:{food:'Veg'}};return go('book');}
+ if(d.svc!==undefined){S.booking={e:S.stack.at(-1)[1],s:+d.svc,day:10,slot:null,upi:'GPay',intake:{food:'Veg'}};return go('book');}
+ if(d.day){S.booking.day=+d.day;return render(true);}
+ if(d.slot){S.booking.slot=d.slot;return render(true);}
+ if(t.id==='toIntake'&&S.booking.slot)return go('intake');
+ if(d.food){S.booking.intake.food=d.food;return render(true);}
+ if(d.upload!==undefined)return toast('Choose a file from your phone here');
+ if(t.id==='toPay'){if(!svcOf(S.booking).price)return finish();return go('pay');}
+ if(d.upi){S.booking.upi=d.upi;return render(true);}
+ if(t.id==='payNow')return finish();
+ if(d.go){S.tab=d.go;S.stack=[];if(d.go==='find')S.goal=null;return render();}
+ if(d.water){const n=+d.water;S.water=S.water===n?n-1:n;return render(true);}
+ if(d.photo)return toast('Camera opens here. Priya sees the photo.');
+ if(d.swap)return toast('Swap request sent for '+d.swap.toLowerCase());
+ if(t.id==='logW'){const w=parseFloat($('wIn').value);if(!(w>20&&w<300))return toast('Enter your weight in kg');S.myWeights.push(w);if(S.myWeights.length>9)S.myWeights.shift();render(true);return toast('Logged. Priya can see it too.');}
+ if(d.energy){S.checkin.energy=+d.energy;return render(true);}
+ if(d.hunger){S.checkin.hunger=+d.hunger;return render(true);}
+ if(t.id==='sendCk')return toast('Check-in sent to Priya');
 });
-document.addEventListener('change',ev=>{const d=ev.target.dataset;if(d.mytask!==undefined)S.myTasks[+d.mytask][1]=ev.target.checked;if(d.task&&ev.target.checked)toast('Task done');});
-document.addEventListener('input',ev=>{if(ev.target.id==='q'){S.q=ev.target.value;const pos=ev.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos);}
- if(ev.target.id==='csearch'){const q=ev.target.value.toLowerCase();document.querySelectorAll('#view .list .item').forEach(i=>i.hidden=!i.textContent.toLowerCase().includes(q));}});
-const h=location.hash.replace('#','');if(h==='client')S.mode='client',S.tab='explore';
-window.addEventListener('hashchange',()=>{const h=location.hash.replace('#','');if(h==='client'&&S.mode!=='client')setMode('client');if(h==='consultant'&&S.mode!=='pro')setMode('pro');});
+function finish(){const b=S.booking,e=NUTS[b.e],s=svcOf(b);S.mine.unshift({who:e.n,what:s.name,when:`${DN[b.day-10]} ${b.day} Nov · ${b.slot}`});S.stack=[['done']];render();}
+document.addEventListener('change',ev=>{const d=ev.target.dataset;
+ if(d.meal){ev.target.checked?S.mealsDone.add(d.meal):S.mealsDone.delete(d.meal);render(true);}
+ if(d.done!==undefined&&ev.target.checked)toast('Done');});
+document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='msgIn')$('sendMsg').click();});
+document.addEventListener('input',ev=>{const t=ev.target;
+ if(t.id==='q'){S.q=t.value;const pos=t.selectionStart;render(true);const q=$('q');q.focus();q.setSelectionRange(pos,pos);}
+ if(t.id==='csearch'){const q=t.value.toLowerCase();document.querySelectorAll('#clist .item').forEach(i=>i.hidden=!i.textContent.toLowerCase().includes(q));}});
+const h=location.hash.replace('#','');if(h==='user')S.mode='user';
+window.addEventListener('hashchange',()=>{const h=location.hash.replace('#','');if(h==='user'&&S.mode!=='user')setMode('user');if(h==='nutritionist'&&S.mode!=='pro')setMode('pro');});
 render();
 </script>
