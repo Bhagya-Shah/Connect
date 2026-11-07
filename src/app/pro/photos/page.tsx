@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireNutritionist } from "@/lib/auth";
 import { fmtTime, todayIST, type Meal } from "@/lib/constants";
@@ -10,7 +11,8 @@ import { RemindButton } from "./RemindButton";
 const TABS = [["review", "To review"], ["reviewed", "Reviewed"], ["missing", "Missing"]] as const;
 
 export default async function PhotosPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
-  const { supabase, user } = await requireNutritionist();
+  const { supabase, user, me } = await requireNutritionist();
+  if (me.specialty === "psychology") redirect("/pro");
   const tab = (await searchParams).tab || "review";
   const today = todayIST();
   const [{ data: links }, { data: logs }, { data: plans }] = await Promise.all([

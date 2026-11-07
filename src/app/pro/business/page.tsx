@@ -36,7 +36,7 @@ export default async function BusinessPage({ searchParams }: { searchParams: Pro
         <ProfileForm n={me} name={profile.full_name ?? ""} />
         <Services services={services ?? []} />
         <Availability initial={windows ?? []} />
-        <PlanPicker current={me.plan as PlanId} live={paymentsLive()} keyId={process.env.RAZORPAY_KEY_ID} />
+        <PlanPicker current={me.plan as PlanId} live={paymentsLive()} keyId={process.env.RAZORPAY_KEY_ID} specialty={me.specialty} />
         <LogoutButton />
       </Body>
     </>

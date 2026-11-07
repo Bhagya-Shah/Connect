@@ -1,7 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import { updateProfile } from "../actions";
-import { FOOD_TYPES, GOALS, LANGUAGES } from "@/lib/constants";
+import { APPROACHES, CONCERNS, DEFAULT_CONSENT, FOOD_TYPES, GOALS, LANGUAGES } from "@/lib/constants";
 import type { Nutritionist } from "@/lib/types";
 
 function Checks({ name, options, value }: { name: string; options: readonly { id: string; name: string }[] | string[]; value: string[] }) {
@@ -21,6 +21,7 @@ function Checks({ name, options, value }: { name: string; options: readonly { id
 
 export function ProfileForm({ n, name }: { n: Nutritionist; name: string }) {
   const [state, action, busy] = useActionState(updateProfile, undefined);
+  const psy = n.specialty === "psychology";
   return (
     <form action={action} className="card">
       <h2 className="h3">Your public profile</h2>
@@ -33,13 +34,17 @@ export function ProfileForm({ n, name }: { n: Nutritionist; name: string }) {
         <label className="text-xs text-muted">Consults<select name="mode" defaultValue={n.mode ?? "Online"} className="input"><option>Online</option><option>Online + clinic</option><option>Clinic only</option></select></label>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <label className="text-xs text-muted">Qualification<input name="qualification" defaultValue={n.qualification ?? ""} className="input" placeholder="M.Sc. Nutrition, RD" /></label>
+        <label className="text-xs text-muted">Qualification<input name="qualification" defaultValue={n.qualification ?? ""} className="input" placeholder={psy ? "M.A. Clinical Psychology, RCI" : "M.Sc. Nutrition, RD"} /></label>
         <label className="text-xs text-muted">Years of experience<input name="experience" inputMode="numeric" defaultValue={n.experience_years ?? ""} className="input" /></label>
       </div>
       <label className="text-xs text-muted">About you<textarea name="about" defaultValue={n.about ?? ""} className="input min-h-20" placeholder="Who you help and how" /></label>
-      <span className="text-xs text-muted">Goals you help with</span><Checks name="goals" options={GOALS} value={n.goals} />
+      <span className="text-xs text-muted">{psy ? "What you help with" : "Goals you help with"}</span><Checks name="goals" options={psy ? CONCERNS : GOALS} value={n.goals} />
       <span className="text-xs text-muted">Languages</span><Checks name="languages" options={LANGUAGES} value={n.languages} />
-      <span className="text-xs text-muted">Food plans you make</span><Checks name="food_types" options={FOOD_TYPES} value={n.food_types} />
+      {psy ? <>
+        <span className="text-xs text-muted">Approaches you use</span><Checks name="approaches" options={APPROACHES} value={n.approaches} />
+        <label className="text-xs text-muted">Consent form clients agree to before the first session
+          <textarea name="consent_text" defaultValue={n.consent_text ?? DEFAULT_CONSENT} className="input min-h-40 text-sm" /></label>
+      </> : <><span className="text-xs text-muted">Food plans you make</span><Checks name="food_types" options={FOOD_TYPES} value={n.food_types} /></>}
       <div className="grid grid-cols-2 gap-2">
         <label className="text-xs text-muted">Session length (min)<input name="session_minutes" inputMode="numeric" defaultValue={n.session_minutes} className="input" /></label>
         <span className="self-end pb-2.5 text-xs text-muted">Video calls happen inside Connect. A Join button appears 5 min before each session.</span>

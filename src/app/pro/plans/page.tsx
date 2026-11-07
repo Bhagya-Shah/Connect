@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireNutritionist } from "@/lib/auth";
 import { PLANS, type Meal } from "@/lib/constants";
@@ -7,6 +8,7 @@ import { Body } from "@/components/Shell";
 export default async function PlansPage({ searchParams }: { searchParams: Promise<{ client?: string; saved?: string }> }) {
   const sp = await searchParams;
   const { supabase, user, me } = await requireNutritionist();
+  if (me.specialty === "psychology") redirect("/pro");
   const canTemplates = PLANS[me.plan as keyof typeof PLANS].templates;
   const [{ data: builtIn }, { data: mine }, { data: client }] = await Promise.all([
     supabase.from("diet_plans").select("*").is("nutritionist_id", null).is("client_id", null).order("kcal"),

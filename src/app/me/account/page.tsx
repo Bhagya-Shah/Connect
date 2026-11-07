@@ -22,7 +22,7 @@ export default async function Account({ searchParams }: { searchParams: Promise<
     <>
       <TopBar title={profile.full_name || "Me"} />
       <Body>
-        {sp.booked && <p className="rounded-xl bg-good-soft p-3 text-sm"><b>You&apos;re booked.</b> The session is below. Your nutritionist has your details.</p>}
+        {sp.booked && <p className="rounded-xl bg-good-soft p-3 text-sm"><b>You&apos;re booked.</b> The session is below. They have your details.</p>}
         <section className="card">
           <h2 className="h3">Upcoming sessions</h2>
           {upcoming.length ? upcoming.map((b) => {
@@ -38,11 +38,11 @@ export default async function Account({ searchParams }: { searchParams: Promise<
           }) : <p className="text-sm text-muted">No upcoming sessions.</p>}
         </section>
         <section className="card">
-          <h2 className="h3">My nutritionists</h2>
+          <h2 className="h3">Working with</h2>
           {links?.length ? links.map((l) => {
             const n = l.n as unknown as N;
             return <div key={l.nutritionist_id} className="flex items-center gap-2.5"><Avatar name={n.profiles.full_name} /><span className="min-w-0 flex-1"><b>{n.profiles.full_name}</b><br /><span className="text-sm text-muted">{l.program || "Active"}</span></span><Link href={`/n/${n.handle}`} className="chip">Book again</Link></div>;
-          }) : <Empty title="None yet"><Link href="/discover" className="text-accent">Find a nutritionist</Link></Empty>}
+          }) : <Empty title="None yet"><Link href="/discover" className="text-accent">Find someone</Link></Empty>}
         </section>
         {!!past.length && <section className="card"><h2 className="h3">Past sessions</h2>{past.map((b) => <Row key={b.id} label={fmtDate(b.starts_at)}>{b.service_name}</Row>)}</section>}
         <section className="card">

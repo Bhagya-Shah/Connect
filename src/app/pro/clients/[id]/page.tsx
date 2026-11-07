@@ -8,6 +8,7 @@ import { Body } from "@/components/Shell";
 import { WeekGrid } from "@/components/WeekGrid";
 import { Chat } from "@/components/Chat";
 import { addNote, endClient, reviewMeal, updateClient } from "../../actions";
+import { PSY_TABS, PsyClient } from "./PsyClient";
 
 const TABS = [["overview", "Overview"], ["plan", "Diet plan"], ["food", "Food log"], ["notes", "Notes"], ["chat", "Chat"]] as const;
 
@@ -20,10 +21,12 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
   if (!link) notFound();
   const name = link.profiles?.full_name || "Client";
   const plan = PLANS[me.plan as keyof typeof PLANS];
-  const { data: dplan } = await supabase.from("diet_plans").select("*").eq("nutritionist_id", user.id).eq("client_id", id).eq("active", true).maybeSingle();
+  const psy = me.specialty === "psychology";
+  const { data: dplan } = psy ? { data: null } : await supabase.from("diet_plans").select("*").eq("nutritionist_id", user.id).eq("client_id", id).eq("active", true).maybeSingle();
 
   let content: React.ReactNode = null;
-  if (tab === "overview") {
+  if (psy) content = await PsyClient({ supabase, uid: user.id, id, name, link, tab, tools: plan.tools, chat: plan.chat });
+  else if (tab === "overview") {
     const [{ data: weights }, { data: checkins }, { data: bookings }, { data: pays }] = await Promise.all([
       supabase.from("weight_logs").select("log_date, weight, waist").eq("client_id", id).order("log_date"),
       supabase.from("checkins").select("*").eq("client_id", id).eq("nutritionist_id", user.id).order("created_at", { ascending: false }).limit(3),
@@ -75,7 +78,7 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
     </>;
   }
 
-  if (tab === "plan") {
+  if (!psy && tab === "plan") {
     content = dplan ? <>
       {sp.saved && <p className="rounded-xl bg-good-soft p-3 text-sm">Plan sent to {name}. They see it in their Today tab.</p>}
       <section className="card">
@@ -94,7 +97,7 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
     </>;
   }
 
-  if (tab === "food") {
+  if (!psy && tab === "food") {
     const { data: logs } = await supabase.from("meal_logs").select("*").eq("client_id", id).eq("nutritionist_id", user.id)
       .gte("log_date", new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10)).order("created_at", { ascending: false });
     const urls = await photoUrls(supabase, (logs ?? []).slice(0, 20).map((l) => l.photo_path));
@@ -119,7 +122,7 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
     </>;
   }
 
-  if (tab === "notes") {
+  if (!psy && tab === "notes") {
     const { data: notes } = await supabase.from("notes").select("*").eq("client_id", id).eq("nutritionist_id", user.id).order("created_at", { ascending: false });
     content = <section className="card">
       <span className="text-sm text-muted">Private to you. {name} never sees these.</span>
@@ -131,7 +134,7 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
     </section>;
   }
 
-  if (tab === "chat") {
+  if (!psy && tab === "chat") {
     const { data: msgs } = await supabase.from("messages").select("id, sender_id, body, created_at").eq("nutritionist_id", user.id).eq("client_id", id).order("created_at").limit(200);
     content = <Chat nutritionistId={user.id} clientId={id} meId={user.id} initial={msgs ?? []}
       disabledReason={plan.chat ? undefined : "Chat comes with the Growth plan. Reminders you send from Meal photos still reach the client."} />;
@@ -146,7 +149,7 @@ export default async function ClientPage({ params, searchParams }: { params: Pro
           <div className="min-w-0 flex-1"><b>{link.program || "Client"}</b><br /><span className="text-sm text-muted">Since {fmtDate(link.started_at)}{link.source === "search" ? " · found you in search" : ""}</span></div>
         </div>
         <nav className="flex gap-0.5 overflow-x-auto rounded-xl border border-line bg-surface p-[3px]" aria-label="Client sections">
-          {TABS.map(([k, l]) => <Link key={k} href={`/pro/clients/${id}?tab=${k}`} aria-current={tab === k ? "page" : undefined}
+          {(psy ? PSY_TABS : TABS).map(([k, l]) => <Link key={k} href={`/pro/clients/${id}?tab=${k}`} aria-current={tab === k ? "page" : undefined}
             className={`flex-1 whitespace-nowrap rounded-[9px] px-1.5 py-1.5 text-center text-[12.5px] font-semibold ${tab === k ? "bg-accent-soft text-accent" : "text-muted"}`}>{l}</Link>)}
         </nav>
         {content}

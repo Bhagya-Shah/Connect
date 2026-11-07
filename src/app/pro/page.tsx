@@ -6,9 +6,11 @@ import { Avatar, FoodTile, Pill, Stat, TopBar } from "@/components/ui";
 import { Body } from "@/components/Shell";
 import { CopyButton } from "@/components/CopyButton";
 import { callState } from "@/lib/call";
+import { PsyHome } from "./PsyHome";
 
 export default async function ProHome() {
   const { supabase, user, profile, me } = await requireNutritionist();
+  if (me.specialty === "psychology") return <PsyHome supabase={supabase} uid={user.id} me={me} first={(profile.full_name || "").split(" ")[0]} />;
   const monthStart = todayIST().slice(0, 8) + "01";
   const [{ data: links }, { data: pending }, { data: bookings }, { data: pays }, { data: recent }] = await Promise.all([
     supabase.from("client_links").select("client_id, program, profiles:client_id(full_name)").eq("nutritionist_id", user.id).eq("status", "active"),

@@ -120,18 +120,19 @@ export async function deletePlan(id: string) {
 
 /* ---------- Business ---------- */
 export async function updateProfile(_: Result, form: FormData): Promise<Result> {
-  const { supabase, uid } = await me();
+  const { supabase, uid, n } = await me();
   const list = (k: string) => form.getAll(k).map(String).filter(Boolean);
   const name = String(form.get("name") || "").trim();
   if (name) await supabase.from("profiles").update({ full_name: name }).eq("id", uid);
   const exp = parseInt(String(form.get("experience") || ""));
-  const mins = parseInt(String(form.get("session_minutes") || "45"));
+  const mins = parseInt(String(form.get("session_minutes") || String(n.session_minutes ?? 45)));
   const { error } = await supabase.from("nutritionists").update({
     city: String(form.get("city") || "").trim() || null, mode: String(form.get("mode") || "Online"),
     about: String(form.get("about") || "").trim() || null, qualification: String(form.get("qualification") || "").trim() || null,
     experience_years: isNaN(exp) ? null : exp, meet_url: String(form.get("meet_url") || "").trim() || null,
     session_minutes: isNaN(mins) ? 45 : Math.min(120, Math.max(15, mins)),
     languages: list("languages"), food_types: list("food_types"), goals: list("goals"),
+    ...(n.specialty === "psychology" ? { approaches: list("approaches"), consent_text: String(form.get("consent_text") || "").trim().slice(0, 6000) || null } : {}),
     published: form.get("published") === "on",
   }).eq("id", uid);
   if (error) return { error: error.message };

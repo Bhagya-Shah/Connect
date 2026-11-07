@@ -23,10 +23,10 @@ export default async function JoinPage({ params, searchParams }: { params: Promi
   return (
     <Shell>
       <main className="flex flex-1 flex-col justify-center gap-4 p-6">
-        {!inv ? <p className="card">This invite link is not valid. Ask your nutritionist for a new one.</p> : <>
+        {!inv ? <p className="card">This invite link is not valid. Ask the person who sent it for a new one.</p> : <>
           <Avatar name={inv.nutritionist_name} size={64} />
           <h1 className="text-xl font-semibold">{inv.nutritionist_name} invited you to Connect</h1>
-          <p className="text-muted">Get your diet plan, send meal photos, and track your progress with {inv.nutritionist_name?.split(" ")[0]}. It&apos;s free for you.</p>
+          <p className="text-muted">{inv.specialty === "psychology" ? `Book sessions, check in on your mood, and do your homework with ${inv.nutritionist_name}. Private and free for you.` : `Get your diet plan, send meal photos, and track your progress with ${inv.nutritionist_name?.split(" ")[0]}. It's free for you.`}</p>
           {error && <p role="alert" className="text-sm text-bad">{error}</p>}
           {user ? <form action={accept}><button className="btn w-full">Join</button></form>
             : <Link className="btn" href={`/login?next=${encodeURIComponent(`/join/${code}`)}`}>Log in to join</Link>}

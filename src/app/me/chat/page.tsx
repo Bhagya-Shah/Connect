@@ -8,10 +8,10 @@ import { Chat } from "@/components/Chat";
 export default async function ChatPage({ searchParams }: { searchParams: Promise<{ with?: string }> }) {
   const sp = await searchParams;
   const { supabase, user } = await requireClient();
-  const { data: links } = await supabase.from("client_links").select("nutritionist_id, n:nutritionist_id(plan, chat_start, chat_end, profiles(full_name))").eq("client_id", user.id).eq("status", "active");
-  type N = { plan: keyof typeof PLANS; chat_start: string | null; chat_end: string | null; profiles: { full_name: string } };
+  const { data: links } = await supabase.from("client_links").select("nutritionist_id, n:nutritionist_id(plan, specialty, chat_start, chat_end, profiles(full_name))").eq("client_id", user.id).eq("status", "active");
+  type N = { plan: keyof typeof PLANS; specialty: string; chat_start: string | null; chat_end: string | null; profiles: { full_name: string } };
   const list = (links ?? []).map((l) => ({ id: l.nutritionist_id, n: l.n as unknown as N }));
-  if (!list.length) return <><TopBar title="Chat" /><Body><Empty title="No nutritionist yet">Once you book or join a nutritionist, you can chat here.</Empty></Body></>;
+  if (!list.length) return <><TopBar title="Chat" /><Body><Empty title="No one to chat with yet">Once you book or join a nutritionist or therapist, you can chat here.</Empty></Body></>;
   const cur = list.find((x) => x.id === sp.with) ?? (list.length === 1 ? list[0] : null);
   if (!cur) return (
     <><TopBar title="Chat" /><Body><div className="card">{list.map((x) => (
@@ -24,9 +24,9 @@ export default async function ChatPage({ searchParams }: { searchParams: Promise
     <>
       <TopBar title={cur.n.profiles.full_name} back={list.length > 1 ? "/me/chat" : undefined} />
       <Body>
-        {hours && <p className="text-center text-xs text-muted">{hours}</p>}
+        {hours && <p className="text-center text-xs text-muted">{hours}{cur.n.specialty === "psychology" ? ". Not for emergencies: " : ""}{cur.n.specialty === "psychology" && <Link href="/help" className="font-semibold text-bad">get help now</Link>}</p>}
         <Chat nutritionistId={cur.id} clientId={user.id} meId={user.id} initial={msgs ?? []}
-          disabledReason={PLANS[cur.n.plan].chat ? undefined : "Your nutritionist's plan doesn't include chat. You'll still get their replies on your meal photos."} />
+          disabledReason={PLANS[cur.n.plan].chat ? undefined : cur.n.specialty === "psychology" ? "Your therapist's plan doesn't include chat. You can talk in your next session." : "Your nutritionist's plan doesn't include chat. You'll still get their replies on your meal photos."} />
       </Body>
     </>
   );

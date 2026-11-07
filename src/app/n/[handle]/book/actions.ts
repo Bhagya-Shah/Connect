@@ -13,7 +13,7 @@ export async function book(_: { error?: string } | undefined, form: FormData) {
   const intake = {
     goal: String(form.get("goal") || ""), food_type: String(form.get("food_type") || ""),
     conditions: form.getAll("conditions").map(String).join(", "), height_cm: String(form.get("height") || ""),
-    weight: String(form.get("weight") || ""), note: String(form.get("note") || "").slice(0, 1000),
+    weight: String(form.get("weight") || ""), therapy_before: String(form.get("therapy_before") || ""), note: String(form.get("note") || "").slice(0, 1000),
   };
   const { data: id, error } = await supabase.rpc("create_booking", { p_service: String(form.get("service")), p_starts: slot, p_intake: intake });
   if (error) return { error: error.message };

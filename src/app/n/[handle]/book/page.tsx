@@ -11,7 +11,7 @@ export default async function BookPage({ params, searchParams }: { params: Promi
   const { handle } = await params;
   const { service } = await searchParams;
   const supabase = await createClient();
-  const { data: n } = await supabase.from("nutritionists").select("id, session_minutes, profiles(full_name)").eq("handle", handle).single();
+  const { data: n } = await supabase.from("nutritionists").select("id, session_minutes, specialty, profiles(full_name)").eq("handle", handle).single();
   if (!n || !service) notFound();
   const { data: s } = await supabase.from("services").select("*").eq("id", service).eq("nutritionist_id", n.id).eq("active", true).single();
   if (!s) notFound();
@@ -33,7 +33,7 @@ export default async function BookPage({ params, searchParams }: { params: Promi
         <section className="card">
           <div className="flex items-center gap-2"><span className="min-w-0 flex-1"><b>{s.name}</b><br /><span className="text-sm text-muted">with {name} · {n.session_minutes} min</span></span><span className="font-display font-semibold">{s.price ? rs(s.price) : "Free"}</span></div>
         </section>
-        {user ? <BookForm serviceId={s.id} days={days} needName={needName} price={s.price} /> : (
+        {user ? <BookForm serviceId={s.id} days={days} needName={needName} price={s.price} psy={n.specialty === "psychology"} /> : (
           <div className="card">
             <span>Log in to pick a time. It takes a minute and you only need your email.</span>
             <Link className="btn" href={`/login?next=${encodeURIComponent(`/n/${handle}/book?service=${s.id}`)}`}>Log in to book</Link>

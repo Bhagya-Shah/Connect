@@ -2,24 +2,48 @@ import { requireClient } from "@/lib/auth";
 import { LineChart, Pill, Stat, TopBar } from "@/components/ui";
 import { Body } from "@/components/Shell";
 import { CheckinForm, WeightForm } from "./Forms";
+import { MoodStrip, ScoreHistory, topFeelings } from "@/components/Mind";
+import { CHECKUPS, type CheckupKind } from "@/lib/constants";
 
 export default async function Progress() {
   const { supabase, user } = await requireClient();
-  const [{ data: weights }, { data: links }, { data: logs }] = await Promise.all([
+  const [{ data: weights }, { data: all }, { data: logs }, { data: moods }, { data: checks }] = await Promise.all([
     supabase.from("weight_logs").select("log_date, weight, waist").eq("client_id", user.id).order("log_date"),
-    supabase.from("client_links").select("nutritionist_id, start_weight, target_weight, height_cm, n:nutritionist_id(profiles(full_name))").eq("client_id", user.id).eq("status", "active"),
+    supabase.from("client_links").select("nutritionist_id, start_weight, target_weight, height_cm, n:nutritionist_id(specialty, profiles(full_name))").eq("client_id", user.id).eq("status", "active"),
     supabase.from("meal_logs").select("status").eq("client_id", user.id).gte("log_date", new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10)),
+    supabase.from("mood_logs").select("log_date, mood, feelings").eq("client_id", user.id).gte("log_date", new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10)).order("log_date"),
+    supabase.from("assessments").select("kind, score, risk, done_at").eq("client_id", user.id).eq("status", "done").order("done_at"),
   ]);
+  const isPsy = (l: { n: unknown }) => (l.n as { specialty?: string } | null)?.specialty === "psychology";
+  const links = (all ?? []).filter((l) => !isPsy(l));
+  const hasPsy = (all ?? []).some(isPsy);
+  const m = moods ?? [];
+  const mind = hasPsy ? <>
+    <section className="card">
+      <h2 className="h3">Mood</h2>
+      <MoodStrip logs={m} days={14} />
+      {m.length >= 2 ? <LineChart data={m.map((x) => x.mood)} unit="/5" /> : <p className="text-sm text-muted">Check in on your Today screen to see your mood over time.</p>}
+      {!!m.length && <div className="flex flex-wrap gap-1.5">{topFeelings(m).map(([f, n]) => <Pill key={f} tone="grey">{f} × {n}</Pill>)}</div>}
+    </section>
+    {(Object.keys(CHECKUPS) as CheckupKind[]).filter((k) => checks?.some((c) => c.kind === k)).map((k) => <ScoreHistory key={k} kind={k} rows={(checks ?? []).filter((c) => c.kind === k)} />)}
+  </> : null;
   const w = (weights ?? []).map((x) => Number(x.weight));
   const link = links?.[0];
   const start = link?.start_weight ?? w[0];
   const now = w.at(-1);
   const reviewed = (logs ?? []).filter((l) => l.status !== "pending");
   const score = reviewed.length ? Math.round((reviewed.filter((l) => l.status === "on_plan").length / reviewed.length) * 100) : null;
+  if (!links.length) return (
+    <>
+      <TopBar title="My progress" />
+      <Body>{mind ?? <p className="card text-sm text-muted">Your progress shows here once you start working with someone.</p>}</Body>
+    </>
+  );
   return (
     <>
       <TopBar title="My progress" />
       <Body>
+        {mind}
         <div className="grid grid-cols-3 gap-2">
           <Stat label="Start" value={start ? `${start} kg` : "–"} />
           <Stat label="Now" value={now ? `${now} kg` : "–"} />

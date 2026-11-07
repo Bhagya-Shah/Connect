@@ -7,20 +7,29 @@ import { Body } from "@/components/Shell";
 import { GoalBoxes } from "@/components/GoalBoxes";
 import { MealPhoto } from "./MealPhoto";
 import { callState } from "@/lib/call";
+import { MindToday } from "./MindToday";
 
 export default async function Today({ searchParams }: { searchParams: Promise<{ joined?: string }> }) {
   const sp = await searchParams;
   const { supabase, user, profile } = await requireClient();
   const today = todayIST();
-  const { data: links } = await supabase.from("client_links").select("nutritionist_id, program, n:nutritionist_id(profiles(full_name))").eq("client_id", user.id).eq("status", "active");
+  const { data: all } = await supabase.from("client_links").select("nutritionist_id, program, consent_at, n:nutritionist_id(specialty, consent_text, profiles(full_name))").eq("client_id", user.id).eq("status", "active");
+  type N = { specialty: string; consent_text: string | null; profiles: { full_name: string } } | null;
+  const links = (all ?? []).filter((l) => (l.n as unknown as N)?.specialty !== "psychology");
+  const psyLinks = (all ?? []).filter((l) => (l.n as unknown as N)?.specialty === "psychology").map((l) => {
+    const n = l.n as unknown as N;
+    return { nutritionist_id: l.nutritionist_id, consent_at: l.consent_at, name: n?.profiles?.full_name ?? "your therapist", consent_text: n?.consent_text ?? null };
+  });
   const first = (profile.full_name || "").split(" ")[0];
-  if (!links?.length) return (
+  if (!all?.length) return (
     <>
       <TopBar title={`Hi${first ? " " + first : ""}`} />
       <Body>
-        <p className="card">You&apos;re not working with a nutritionist yet. Pick your goal to find one, or open the invite link your nutritionist sent you.</p>
-        <h2 className="h3">What do you need help with?</h2>
+        <p className="card">You&apos;re not working with anyone yet. Pick what you need help with, or open the invite link your nutritionist or therapist sent you.</p>
+        <h2 className="h3">Eat better</h2>
         <GoalBoxes />
+        <h2 className="h3">Feel better</h2>
+        <GoalBoxes field="psychology" />
       </Body>
     </>
   );
@@ -34,8 +43,9 @@ export default async function Today({ searchParams }: { searchParams: Promise<{ 
     <>
       <TopBar title={`Today · ${fmtDate(new Date(), { weekday: "short", day: "numeric", month: "short" })}`} />
       <Body>
-        {sp.joined && <p className="rounded-xl bg-good-soft p-3 text-sm">You&apos;re connected. Your plan and meal photos live here.</p>}
+        {sp.joined && <p className="rounded-xl bg-good-soft p-3 text-sm">You&apos;re connected. {psyLinks.length && !links.length ? "Your check-ins, homework and sessions live here." : "Your plan and meal photos live here."}</p>}
         {next && <Link href={callState(next) === "open" ? `/call/${next.id}` : "/me/account"} className="card border-transparent bg-accent-soft"><div className="flex items-center gap-2"><span className="flex flex-1 flex-col"><span className="text-xs text-muted">Next session</span><b>{next.service_name}</b><span className="text-sm text-muted">{fmtDate(next.starts_at)} at {fmtTime(next.starts_at)}</span></span>{callState(next) === "open" && <span className="btn btn-sm">Join call</span>}</div></Link>}
+        {!!psyLinks.length && <MindToday supabase={supabase} uid={user.id} links={psyLinks} />}
         {links.map((l) => {
           const nName = (l.n as unknown as { profiles: { full_name: string } } | null)?.profiles?.full_name ?? "your nutritionist";
           const plan = plans?.find((p) => p.nutritionist_id === l.nutritionist_id);

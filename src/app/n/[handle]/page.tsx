@@ -18,7 +18,8 @@ export default async function NutritionistPage({ params }: { params: Promise<{ h
   const { data: n } = await supabase.from("nutritionists").select("*, profiles(full_name)").eq("handle", handle).single();
   if (!n) notFound();
   const { data: services } = await supabase.from("services").select("*").eq("nutritionist_id", n.id).eq("active", true).order("price");
-  const name = n.profiles?.full_name ?? "Nutritionist";
+  const psy = n.specialty === "psychology";
+  const name = n.profiles?.full_name ?? (psy ? "Therapist" : "Nutritionist");
   return (
     <Shell>
       <TopBar title={name} back="/discover" />
@@ -26,15 +27,16 @@ export default async function NutritionistPage({ params }: { params: Promise<{ h
         {!n.published && <p className="rounded-xl bg-saffron-soft p-3 text-sm">This profile is hidden from search. Only you can see it until you switch it on in Business.</p>}
         <div className="flex items-center gap-3">
           <Avatar name={name} size={60} />
-          <div className="min-w-0 flex-1"><b>{n.qualification || "Nutritionist"}{n.experience_years ? ` · ${n.experience_years} years` : ""}</b><br /><span className="text-sm text-muted">{[n.city, n.mode].filter(Boolean).join(" · ")}</span></div>
+          <div className="min-w-0 flex-1"><b>{n.qualification || (psy ? "Psychologist" : "Nutritionist")}{n.experience_years ? ` · ${n.experience_years} years` : ""}</b><br /><span className="text-sm text-muted">{[n.city, n.mode].filter(Boolean).join(" · ")}</span></div>
         </div>
         {n.about && <p>{n.about}</p>}
         {!!n.goals.length && <div className="flex flex-wrap gap-1.5">{n.goals.map((g: string) => <Pill key={g}>{goalName(g)}</Pill>)}</div>}
         <section className="card">
           <Row label="Languages">{n.languages.join(", ") || "–"}</Row>
-          <Row label="Food plans">{n.food_types.join(", ") || "–"}</Row>
+          {psy ? <Row label="Approaches">{n.approaches.join(", ") || "–"}</Row> : <Row label="Food plans">{n.food_types.join(", ") || "–"}</Row>}
           <Row label="Session length">{n.session_minutes} min</Row>
         </section>
+        {psy && <p className="rounded-xl bg-surface-2 p-3 text-sm text-muted">Sessions are private video calls inside Connect. What you share stays between you and {name.split(" ")[0] === "Dr." ? name : name.split(" ")[0]}.</p>}
         <h2 className="h3">Choose a service</h2>
         {services?.length ? services.map((s) => (
           <Link key={s.id} href={`/n/${handle}/book?service=${s.id}`} className="card">

@@ -3,11 +3,11 @@ import { useState, useTransition } from "react";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { switchPlanTest } from "../actions";
-import { PLANS, rs, type PlanId } from "@/lib/constants";
+import { PLANS, planText, rs, type PlanId } from "@/lib/constants";
 
 declare global { interface Window { Razorpay?: new (o: Record<string, unknown>) => { open: () => void } } }
 
-export function PlanPicker({ current, live, keyId }: { current: PlanId; live: boolean; keyId?: string }) {
+export function PlanPicker({ current, live, keyId, specialty }: { current: PlanId; live: boolean; keyId?: string; specialty?: string }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -32,7 +32,7 @@ export function PlanPicker({ current, live, keyId }: { current: PlanId; live: bo
       <h2 className="h3">Your plan</h2>
       {!live && <p className="rounded-xl bg-saffron-soft p-2.5 text-xs">Test mode: plans switch without payment until Razorpay keys are added.</p>}
       {(Object.keys(PLANS) as PlanId[]).map((p) => {
-        const P = PLANS[p], on = p === current;
+        const P = { ...PLANS[p], ...planText(p, specialty) }, on = p === current;
         return (
           <div key={p} className={`flex flex-col gap-1.5 rounded-2xl border p-3 ${on ? "border-accent bg-accent-soft" : "border-line"}`}>
             <div className="flex items-baseline gap-2"><b className="flex-1 font-display">{P.name}</b><span className="font-display font-semibold">{P.price ? `${rs(P.price)}/mo` : "Free"}</span></div>

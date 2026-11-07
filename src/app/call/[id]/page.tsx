@@ -16,7 +16,7 @@ export default async function CallPage({ params }: { params: Promise<{ id: strin
   if (!b) notFound();
   const isPro = user.id === b.nutritionist_id;
   const clientName = (b.client as unknown as { full_name: string | null } | null)?.full_name || "Client";
-  const proName = (b.n as unknown as { profiles: { full_name: string | null } } | null)?.profiles?.full_name || "your nutritionist";
+  const proName = (b.n as unknown as { profiles: { full_name: string | null } } | null)?.profiles?.full_name || "your expert";
   const other = isPro ? clientName : proName;
   const back = isPro ? `/pro/clients/${b.client_id}` : "/me/account";
   const state = callState(b);

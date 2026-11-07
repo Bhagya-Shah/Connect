@@ -22,6 +22,26 @@ People find the right nutritionist for their goal. Nutrition first; other fields
 | Video calls | In-app call per booking (LiveKit): Join opens 5 min before, screen share, in-call chat, private notes saved to the client | Join from the booking, waiting room until the nutritionist joins |
 | Plans | Starter (free, 5 clients, 5% fee), Growth ₹499, Pro ₹999, Clinic ₹2,499, limits enforced | Free |
 
+### Psychologists, therapists and counsellors
+
+Therapists sign up with "I'm a therapist" and get their own version of the app. Bookings, payments, video calls, chat and
+private notes are shared with the nutrition side; the rest is built for therapy:
+
+| Area | Therapist | Client |
+| --- | --- | --- |
+| Find | Profile with concerns (anxiety, stress, relationships…), approaches (CBT, DBT…) | "Feel better" boxes, filters by approach and language |
+| Consent | Own consent text (a sensible default is filled in) | Must agree before the first session; date is recorded |
+| Mood | Mood strip, top feelings, notes; alert on very low or two low days | 10-second daily check-in (face, feelings, note) |
+| Check-ups | Send PHQ-9 / GAD-7, score history charts, every answer; risk flag if PHQ-9 Q9 > 0 | Answer on the phone; crisis numbers shown at once if Q9 > 0 |
+| Homework | Exercise library (thought record, breathing, grounding…) or own task, due date | Mark done with a short reply |
+| Journal | Reads only entries the client shares | Private by default, share per entry |
+| Session notes | Talked about / noticed / plan, private | Never visible |
+| Safety | Home screen "Needs attention" list | "Get help now" page with Tele-MANAS 14416 and 112 |
+
+Mood, journal and check-ups are visible only to the client's therapist, never to a nutritionist they also see.
+Scores are calculated in the database, so they can't be edited by either side. Plans and prices are the same for
+both fields; the plan list shows therapy features to therapists (check-ups, homework and journal need Growth).
+
 Connect takes 10% only on clients who found the nutritionist through Connect search, never on their own clients.
 
 **Not built yet:** WhatsApp reminders (reminders go to in-app chat for now), SMS/phone login, GST invoice PDFs,

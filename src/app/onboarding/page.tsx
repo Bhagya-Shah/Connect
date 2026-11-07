@@ -9,5 +9,5 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const sp = await searchParams;
   if (profile?.role === "nutritionist") redirect("/pro");
   if (profile?.role === "client") redirect(sp.next || "/me");
-  return <Shell><Onboarding next={sp.next} initial={sp.as === "nutritionist" ? "nutritionist" : undefined} /></Shell>;
+  return <Shell><Onboarding next={sp.next} initial={sp.as === "nutritionist" ? "nutritionist" : sp.as === "therapist" ? "psychology" : undefined} /></Shell>;
 }
