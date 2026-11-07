@@ -1,0 +1,9 @@
+{
+  "name": "Connect",
+  "short_name": "Connect",
+  "start_url": "/me",
+  "display": "standalone",
+  "background_color": "#EEF1F6",
+  "theme_color": "#1F5BD8",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
