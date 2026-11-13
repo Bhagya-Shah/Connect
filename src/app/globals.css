@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #EEF1F6; --surface: #FFFFFF; --surface-2: #F4F6FA; --ink: #17223A; --muted: #5B6680; --line: #DDE2EC;
+  --accent: #1F5BD8; --accent-ink: #FFFFFF; --accent-soft: #E3ECFD; --saffron: #E39A2D; --saffron-soft: #FCF0DC;
+  --good: #1E8A5A; --good-soft: #DDF3E8; --warn: #A35E06; --bad: #C2413A; --bad-soft: #FBE3E1;
+  --t1: #DCE7FF; --t2: #FCE7C8; --t3: #D6F2E4; --t4: #F6DCE6; --t5: #E6E0FA; --t6: #D9F0F5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0C1220; --surface: #151D2E; --surface-2: #1C2639; --ink: #E7ECF5; --muted: #9AA6BE; --line: #2A3650;
+    --accent: #6E9BFF; --accent-ink: #0C1220; --accent-soft: #1E2E52; --saffron: #F0B55A; --saffron-soft: #3A2C14;
+    --good: #4FC48C; --good-soft: #163A2A; --warn: #F0B55A; --bad: #F08A82; --bad-soft: #3E1D1B;
+    --t1: #1F2C4D; --t2: #3A2C17; --t3: #173628; --t4: #3A1F2A; --t5: #2A2448; --t6: #173640;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg); --color-surface: var(--surface); --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink); --color-muted: var(--muted); --color-line: var(--line);
+  --color-accent: var(--accent); --color-accent-ink: var(--accent-ink); --color-accent-soft: var(--accent-soft);
+  --color-saffron: var(--saffron); --color-saffron-soft: var(--saffron-soft);
+  --color-good: var(--good); --color-good-soft: var(--good-soft); --color-warn: var(--warn);
+  --color-bad: var(--bad); --color-bad-soft: var(--bad-soft);
+  --font-display: var(--font-sora), "Segoe UI", system-ui, sans-serif;
+  --font-sans: var(--font-figtree), "Segoe UI", system-ui, sans-serif;
+}
+
+body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@layer components {
+  .card { @apply bg-surface border border-line rounded-2xl p-3.5 flex flex-col gap-2.5; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-3 font-semibold bg-accent text-accent-ink disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-3 font-semibold bg-accent-soft text-accent cursor-pointer; }
+  .btn-sm { @apply px-3 py-2 text-sm; }
+  .input { @apply w-full min-w-0 rounded-xl border border-line bg-surface px-3 py-2.5 text-ink; }
+  .chip { @apply rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium whitespace-nowrap cursor-pointer; }
+  .chip-on { @apply bg-ink text-bg border-ink; }
+  .pill { @apply rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap; }
+  .label { @apply text-xs font-semibold uppercase tracking-wider text-muted; }
+  .h3 { @apply font-display text-[15px] font-semibold; }
+}
