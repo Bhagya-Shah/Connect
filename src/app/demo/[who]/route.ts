@@ -5,7 +5,7 @@ import { DEMO, demoPassword, ensureDemo, type DemoWho } from "@/lib/demo";
 
 export const maxDuration = 60;
 
-/** One-tap demo login: makes the sample practices if needed, then signs in as one of them. */
+/** One-tap demo login: makes the sample practice if needed, then signs in as the nutritionist or a client. */
 export async function GET(request: Request, { params }: { params: Promise<{ who: string }> }) {
   const { who } = await params;
   const url = new URL(request.url);

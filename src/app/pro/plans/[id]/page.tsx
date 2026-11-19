@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { requireNutritionist } from "@/lib/auth";
 import { TopBar } from "@/components/ui";
@@ -8,8 +7,7 @@ import { PlanBuilder } from "./PlanBuilder";
 export default async function PlanPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ client?: string }> }) {
   const { id } = await params;
   const { client } = await searchParams;
-  const { supabase, user, me } = await requireNutritionist();
-  if (me.specialty === "psychology") redirect("/pro");
+  const { supabase, user } = await requireNutritionist();
   let initial = { name: "New plan", tag: "", kcal: null as number | null, meals: [] as never[] };
   let own = false;
   if (id !== "new") {
@@ -27,7 +25,7 @@ export default async function PlanPage({ params, searchParams }: { params: Promi
   return (
     <>
       <TopBar title={clientName ? `Plan for ${clientName}` : "Plan builder"} back={client ? `/pro/plans?client=${client}` : "/pro/plans"} />
-      <Body><PlanBuilder initial={initial} planId={own ? id : undefined} clientId={client} clientName={clientName} canDelete={own && !client} /></Body>
+      <Body><div className="w-full max-w-2xl"><PlanBuilder initial={initial} planId={own ? id : undefined} clientId={client} clientName={clientName} canDelete={own && !client} /></div></Body>
     </>
   );
 }

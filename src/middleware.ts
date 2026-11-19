@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Keeps the login fresh and sends logged-out people to /login. */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
@@ -19,15 +20,14 @@ export async function middleware(request: NextRequest) {
   );
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  if (!user && (path.startsWith("/pro") || path.startsWith("/me") || path.startsWith("/onboarding") || path.startsWith("/call") || path.startsWith("/invoice") || path.startsWith("/join-clinic"))) {
+  if (!user && (path.startsWith("/pro") || path.startsWith("/me") || path.startsWith("/onboarding"))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}`;
+    url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}${path.startsWith("/me") ? "&as=client" : ""}`;
     return NextResponse.redirect(url);
   }
   return response;
 }
 
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/razorpay/webhook|.*\\.(?:svg|png|jpg|jpeg|webp)$).*)"],
-};
+// Only pages that need a login run this. The landing and login pages stay static and fast.
+export const config = { matcher: ["/pro/:path*", "/me/:path*", "/onboarding", "/go"] };

@@ -74,3 +74,18 @@ export function FoodTile({ label, url, size = 64 }: { label: string; url?: strin
     </span>
   );
 }
+
+/** Segmented links, e.g. client tabs. */
+export function Tabs({ items, current, label }: { items: [string, string, string][]; current: string; label: string }) {
+  return (
+    <nav className="flex gap-0.5 overflow-x-auto rounded-xl border border-line bg-surface p-[3px]" aria-label={label}>
+      {items.map(([k, l, href]) => <Link key={k} href={href} aria-current={current === k ? "page" : undefined} scroll={false}
+        className={`flex-1 whitespace-nowrap rounded-[9px] px-2.5 py-1.5 text-center text-[13px] font-semibold ${current === k ? "bg-accent-soft text-accent" : "text-muted"}`}>{l}</Link>)}
+    </nav>
+  );
+}
+
+export function Notice({ tone = "good", children }: { tone?: "good" | "warn" | "bad"; children: React.ReactNode }) {
+  const c = { good: "bg-good-soft", warn: "bg-saffron-soft", bad: "bg-bad-soft text-bad" }[tone];
+  return <p className={`rounded-xl p-3 text-sm ${c}`}>{children}</p>;
+}

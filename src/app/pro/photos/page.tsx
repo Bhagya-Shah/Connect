@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireNutritionist } from "@/lib/auth";
 import { fmtTime, todayIST, type Meal } from "@/lib/constants";
@@ -11,8 +10,7 @@ import { RemindButton } from "./RemindButton";
 const TABS = [["review", "To review"], ["reviewed", "Reviewed"], ["missing", "Missing"]] as const;
 
 export default async function PhotosPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
-  const { supabase, user, me } = await requireNutritionist();
-  if (me.specialty === "psychology") redirect("/pro");
+  const { supabase, user } = await requireNutritionist();
   const tab = (await searchParams).tab || "review";
   const today = todayIST();
   const [{ data: links }, { data: logs }, { data: plans }] = await Promise.all([
@@ -50,9 +48,9 @@ export default async function PhotosPage({ searchParams }: { searchParams: Promi
           {TABS.map(([k, l]) => <Link key={k} href={`/pro/photos?tab=${k}`} aria-current={tab === k ? "page" : undefined}
             className={`flex-1 rounded-[9px] py-1.5 text-center text-[13px] font-semibold ${tab === k ? "bg-accent-soft text-accent" : "text-muted"}`}>{l}</Link>)}
         </nav>
-        {tab === "review" && (toReview.length ? toReview.map((l) => (
+        {tab === "review" && (toReview.length ? <div className="grid items-start gap-3 md:grid-cols-2">{toReview.map((l) => (
           <ReviewCard key={l.id} log={l} url={l.photo_path ? urls[l.photo_path] ?? null : null} clientName={names.get(l.client_id)!} time={fmtTime(l.created_at)} />
-        )) : <Empty title="All caught up">New photos show up here as clients send them.</Empty>)}
+        )) }</div> : <Empty title="All caught up">New photos show up here as clients send them.</Empty>)}
         {tab === "reviewed" && (reviewed.length ? reviewed.map((l) => (
           <div key={l.id} className="card">
             <div className="flex items-center gap-2.5">
@@ -74,7 +72,7 @@ export default async function PhotosPage({ searchParams }: { searchParams: Promi
             ))}
           </div>
           <RemindButton clientIds={missing.map((m) => m.client_id)} label="Remind everyone" />
-          <span className="text-center text-xs text-muted">Reminders arrive in the client&apos;s chat. WhatsApp reminders come in a later version.</span>
+          <span className="text-center text-xs text-muted">Reminders arrive in the client&apos;s chat in the app.</span>
         </> : <Empty title="No missing photos right now">Clients who skip a meal photo show up here 30 minutes after the meal time.</Empty>)}
       </Body>
     </>
