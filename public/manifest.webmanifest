@@ -1,7 +1,7 @@
 {
   "name": "Connect",
   "short_name": "Connect",
-  "start_url": "/me",
+  "start_url": "/go",
   "display": "standalone",
   "background_color": "#EEF1F6",
   "theme_color": "#1F5BD8",

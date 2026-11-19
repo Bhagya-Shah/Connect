@@ -1,21 +1,139 @@
 "use server";
+import { randomInt } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { PLANS, type Meal, type PlanId } from "@/lib/constants";
-import { paymentsLive } from "@/lib/razorpay";
+import { cleanPhone, phoneEmail, type Meal } from "@/lib/constants";
+import { cleanMeetUrl } from "@/lib/meet";
 
 async function me() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const { data: n } = await supabase.from("nutritionists").select("*").eq("id", user.id).single();
+  const { data: n } = await supabase.from("nutritionists").select("id, meet_url, session_minutes").eq("id", user.id).single();
   if (!n) redirect("/onboarding");
   return { supabase, uid: user.id, n };
 }
 
-export type Result = { ok?: boolean; error?: string; link?: string } | undefined;
+export type Result = { ok?: boolean; error?: string } | undefined;
+export type LoginResult = { ok?: boolean; error?: string; clientId?: string; name?: string; loginId?: string; password?: string; existing?: boolean; phone?: string } | undefined;
+
+const WORDS = ["mango", "jeera", "methi", "lemon", "apple", "guava", "tulsi", "amla", "chana", "moong", "ragi", "jowar", "papaya", "ginger", "haldi", "dates"];
+const newPassword = () => WORDS[randomInt(WORDS.length)] + String(randomInt(1000, 10000));
+const num = (form: FormData, k: string) => { const v = parseFloat(String(form.get(k) || "")); return isNaN(v) ? null : v; };
+const text = (form: FormData, k: string, max = 200) => String(form.get(k) || "").trim().slice(0, max) || null;
+
+/* ---------- Clients ---------- */
+
+/** Adds a client and makes their login (phone or email + password). */
+export async function addClient(_: LoginResult, form: FormData): Promise<LoginResult> {
+  const { uid } = await me();
+  const name = text(form, "name", 80);
+  const phone = cleanPhone(String(form.get("phone") || ""));
+  const email = String(form.get("email") || "").trim().toLowerCase() || null;
+  if (!name) return { error: "Enter the client's name." };
+  if (phone.length !== 10) return { error: "Enter a 10-digit mobile number." };
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "That email doesn't look right." };
+
+  const admin = createAdminClient();
+  const authEmail = email ?? phoneEmail(phone);
+  const password = newPassword();
+  let clientId: string | null = null;
+  let existing = false;
+  const created = await admin.auth.admin.createUser({ email: authEmail, password, email_confirm: true, user_metadata: { full_name: name, phone } });
+  if (created.data.user) clientId = created.data.user.id;
+  else {
+    // Already has a Connect login (another practice, or added before): link it, keep their password.
+    const { data: prof } = await admin.from("profiles").select("id, role").eq("phone", phone).limit(1).maybeSingle();
+    const found = prof?.id ?? (await findUserByEmail(admin, authEmail));
+    if (!found) return { error: created.error?.message ?? "Couldn't create the login. Try again." };
+    if (found === uid) return { error: "That's your own number." };
+    const { data: p } = await admin.from("profiles").select("role").eq("id", found).single();
+    if (p?.role === "nutritionist") return { error: "That number belongs to a nutritionist account." };
+    clientId = found;
+    existing = true;
+    if (!p?.role) await admin.from("profiles").update({ role: "client", full_name: name, phone }).eq("id", found);
+  }
+  if (!existing) {
+    const { error } = await admin.from("profiles").upsert({ id: clientId, role: "client", full_name: name, phone });
+    if (error) return { error: error.message };
+  }
+  const { data: link } = await admin.from("client_links").select("id, status").eq("nutritionist_id", uid).eq("client_id", clientId).maybeSingle();
+  if (link?.status === "active") return { error: "This client is already in your list. Open them from Clients to send their login again." };
+  const row = {
+    nutritionist_id: uid, client_id: clientId, status: "active", source: "own", invite_name: name, invite_email: email, phone,
+    program: text(form, "program"), goal: text(form, "goal"), food_type: text(form, "food_type", 40), conditions: text(form, "conditions"),
+    height_cm: num(form, "height"), start_weight: num(form, "weight"), target_weight: num(form, "target"),
+    login_owner: !existing, started_at: new Date().toISOString().slice(0, 10),
+  };
+  const { login_owner, ...keep } = row;
+  const { error } = link
+    ? await admin.from("client_links").update(keep).eq("id", link.id)
+    : await admin.from("client_links").insert({ ...keep, login_owner });
+  if (error) return { error: error.message };
+  // no revalidatePath: the form shows the login card, and other pages load fresh on the next visit
+  return { ok: true, clientId: clientId!, name, loginId: email ?? phone, password: existing ? undefined : password, existing, phone };
+}
+
+async function findUserByEmail(admin: ReturnType<typeof createAdminClient>, email: string) {
+  for (let page = 1; page <= 20; page++) {
+    const { data } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    const u = data?.users.find((x) => x.email?.toLowerCase() === email);
+    if (u) return u.id;
+    if (!data || data.users.length < 200) return null;
+  }
+  return null;
+}
+
+/** New password for a client login this nutritionist made. */
+export async function resetClientPassword(clientId: string): Promise<LoginResult> {
+  const { supabase, uid } = await me();
+  const { data: link } = await supabase.from("client_links").select("login_owner, phone, invite_email, profiles:client_id(full_name)").eq("nutritionist_id", uid).eq("client_id", clientId).eq("status", "active").single();
+  if (!link) return { error: "Client not found." };
+  if (!link.login_owner) return { error: "This client made their login elsewhere. They can change their password from their Me tab." };
+  const password = newPassword();
+  const { error } = await createAdminClient().auth.admin.updateUserById(clientId, { password });
+  if (error) return { error: error.message };
+  const name = (link.profiles as unknown as { full_name: string | null } | null)?.full_name ?? "Client";
+  return { ok: true, clientId, name, loginId: link.invite_email ?? link.phone ?? "", password, phone: link.phone ?? undefined };
+}
+
+export async function updateClient(clientId: string, form: FormData) {
+  const { supabase, uid } = await me();
+  const name = text(form, "name", 80);
+  await supabase.from("client_links").update({
+    program: text(form, "program"), goal: text(form, "goal"), food_type: text(form, "food_type", 40), conditions: text(form, "conditions"),
+    height_cm: num(form, "height"), start_weight: num(form, "weight"), target_weight: num(form, "target"),
+    ...(name ? { invite_name: name } : {}),
+  }).eq("nutritionist_id", uid).eq("client_id", clientId);
+  if (name) {
+    const { data: l } = await supabase.from("client_links").select("login_owner").eq("nutritionist_id", uid).eq("client_id", clientId).single();
+    if (l?.login_owner) await createAdminClient().from("profiles").update({ full_name: name }).eq("id", clientId);
+  }
+  revalidatePath(`/pro/clients/${clientId}`);
+}
+
+export async function endClient(clientId: string) {
+  const { supabase, uid } = await me();
+  await supabase.from("client_links").update({ status: "ended" }).eq("nutritionist_id", uid).eq("client_id", clientId);
+  revalidatePath("/pro", "layout");
+  redirect("/pro/clients");
+}
+
+export async function restoreClient(clientId: string) {
+  const { supabase, uid } = await me();
+  await supabase.from("client_links").update({ status: "active" }).eq("nutritionist_id", uid).eq("client_id", clientId);
+  revalidatePath("/pro", "layout");
+}
+
+export async function addNote(clientId: string, form: FormData) {
+  const { supabase, uid } = await me();
+  const body = String(form.get("body") || "").trim();
+  if (!body) return;
+  await supabase.from("notes").insert({ nutritionist_id: uid, client_id: clientId, body });
+  revalidatePath(`/pro/clients/${clientId}`);
+}
 
 /* ---------- Meal photos ---------- */
 export async function reviewMeal(id: string, status: "on_plan" | "off_plan" | null, reply?: string) {
@@ -30,66 +148,63 @@ export async function reviewMeal(id: string, status: "on_plan" | "off_plan" | nu
   revalidatePath("/pro", "layout");
 }
 
-export async function remindClient(clientId: string, text?: string) {
+export async function remindClient(clientId: string, body?: string) {
   const { supabase, uid } = await me();
   await supabase.from("messages").insert({ nutritionist_id: uid, client_id: clientId, sender_id: uid,
-    body: text || "Friendly reminder: please send a photo of your next meal in the Today tab." });
+    body: body || "Friendly reminder: please send a photo of your next meal in the Today tab." });
   revalidatePath("/pro/photos");
 }
 
-/* ---------- Clients ---------- */
-export async function inviteClient(_: Result, form: FormData): Promise<Result> {
+/* ---------- Sessions (Google Meet) ---------- */
+export async function scheduleSession(_: Result, form: FormData): Promise<Result> {
   const { supabase, uid, n } = await me();
-  const name = String(form.get("name") || "").trim();
-  if (!name) return { error: "Enter the client's name." };
-  const lim = PLANS[n.plan as PlanId].clients;
-  const { count } = await supabase.from("client_links").select("id", { count: "exact", head: true }).eq("nutritionist_id", uid).eq("status", "active");
-  if (lim !== null && (count ?? 0) >= lim) return { error: `Your ${PLANS[n.plan as PlanId].name} plan allows ${lim} active clients. Upgrade in Business to add more.` };
-  const num = (k: string) => { const v = parseFloat(String(form.get(k) || "")); return isNaN(v) ? null : v; };
-  const { data, error } = await supabase.from("client_links").insert({
-    nutritionist_id: uid, invite_name: name, invite_email: String(form.get("email") || "").trim() || null,
-    program: String(form.get("program") || "").trim() || null, goal: String(form.get("goal") || "").trim() || null,
-    height_cm: num("height"), start_weight: num("weight"), target_weight: num("target"),
-  }).select("invite_code").single();
-  if (error) return { error: error.message };
-  revalidatePath("/pro/clients");
-  return { ok: true, link: `${process.env.NEXT_PUBLIC_SITE_URL}/join/${data.invite_code}` };
+  const clientId = String(form.get("client") || "");
+  const date = String(form.get("date") || ""), time = String(form.get("time") || "");
+  const mins = Math.min(240, Math.max(10, parseInt(String(form.get("minutes") || n.session_minutes || 45)) || 45));
+  const starts = new Date(`${date}T${time}:00+05:30`);
+  if (!clientId) return { error: "Pick a client." };
+  if (isNaN(starts.getTime())) return { error: "Pick a date and time." };
+  if (starts.getTime() < Date.now() - 60 * 60e3) return { error: "Pick a time in the future." };
+  const rawMeet = String(form.get("meet_url") || "");
+  const meet = cleanMeetUrl(rawMeet);
+  if (rawMeet.trim() && !meet) return { error: "Paste the full Google Meet link, like https://meet.google.com/abc-defg-hij" };
+  const ends = new Date(starts.getTime() + mins * 60e3);
+  const { error } = await supabase.from("bookings").insert({
+    nutritionist_id: uid, client_id: clientId, service_name: text(form, "title", 80) ?? "Consultation",
+    starts_at: starts.toISOString(), ends_at: ends.toISOString(), status: "confirmed", amount: 0,
+    meet_url: meet ?? n.meet_url ?? null, notes: text(form, "notes", 2000),
+  });
+  if (error) return { error: error.code === "23505" ? "You already have a session at that exact time." : error.message };
+  if (form.get("save_default") === "on" && meet) await supabase.from("nutritionists").update({ meet_url: meet }).eq("id", uid);
+  return { ok: true };
 }
 
-export async function cancelInvite(id: string) {
+export async function setSessionStatus(id: string, status: "completed" | "cancelled" | "confirmed") {
   const { supabase, uid } = await me();
-  await supabase.from("client_links").delete().eq("id", id).eq("nutritionist_id", uid).eq("status", "invited");
-  revalidatePath("/pro/clients");
-}
-
-export async function updateClient(clientId: string, form: FormData) {
-  const { supabase, uid } = await me();
-  const num = (k: string) => { const v = parseFloat(String(form.get(k) || "")); return isNaN(v) ? null : v; };
-  await supabase.from("client_links").update({
-    program: String(form.get("program") || "").trim() || null, goal: String(form.get("goal") || "").trim() || null,
-    height_cm: num("height"), start_weight: num("weight"), target_weight: num("target"),
-  }).eq("nutritionist_id", uid).eq("client_id", clientId);
-  revalidatePath(`/pro/clients/${clientId}`);
-}
-
-export async function endClient(clientId: string) {
-  const { supabase, uid } = await me();
-  await supabase.from("client_links").update({ status: "ended" }).eq("nutritionist_id", uid).eq("client_id", clientId);
+  await supabase.from("bookings").update({ status }).eq("id", id).eq("nutritionist_id", uid);
   revalidatePath("/pro", "layout");
-  redirect("/pro/clients");
 }
 
-export async function addNote(clientId: string, form: FormData) {
+export async function setSessionMeet(id: string, form: FormData) {
   const { supabase, uid } = await me();
-  const body = String(form.get("body") || "").trim();
-  if (!body) return;
-  await supabase.from("notes").insert({ nutritionist_id: uid, client_id: clientId, body });
-  revalidatePath(`/pro/clients/${clientId}`);
+  const meet = cleanMeetUrl(String(form.get("meet_url") || ""));
+  await supabase.from("bookings").update({ meet_url: meet }).eq("id", id).eq("nutritionist_id", uid);
+  revalidatePath("/pro", "layout");
+}
+
+/* ---------- Files ---------- */
+export async function deleteFile(id: string) {
+  const { supabase, uid } = await me();
+  const { data: f } = await supabase.from("client_files").select("path, client_id").eq("id", id).eq("nutritionist_id", uid).single();
+  if (!f) return;
+  await supabase.storage.from("client-files").remove([f.path]);
+  await supabase.from("client_files").delete().eq("id", id);
+  revalidatePath("/pro", "layout");
 }
 
 /* ---------- Diet plans ---------- */
 export async function savePlan(input: { id?: string; name: string; tag?: string; kcal?: number | null; meals: Meal[]; clientId?: string | null }): Promise<Result> {
-  const { supabase, uid, n } = await me();
+  const { supabase, uid } = await me();
   const meals = input.meals.map((m) => ({ name: m.name.trim(), time: m.time, items: m.items.map((x) => x.trim()).filter(Boolean) })).filter((m) => m.name);
   if (!input.name.trim()) return { error: "Give the plan a name." };
   if (!meals.length) return { error: "Add at least one meal." };
@@ -102,7 +217,6 @@ export async function savePlan(input: { id?: string; name: string; tag?: string;
     revalidatePath(`/pro/clients/${input.clientId}`);
     redirect(`/pro/clients/${input.clientId}?tab=plan&saved=1`);
   }
-  if (!PLANS[n.plan as PlanId].templates) return { error: "Saving your own templates needs the Growth plan. You can still send this plan to a client." };
   const q = input.id ? supabase.from("diet_plans").update(row).eq("id", input.id).eq("nutritionist_id", uid).is("client_id", null)
     : supabase.from("diet_plans").insert(row);
   const { error } = await q;
@@ -118,117 +232,24 @@ export async function deletePlan(id: string) {
   redirect("/pro/plans");
 }
 
-/* ---------- Business ---------- */
-export async function updateProfile(_: Result, form: FormData): Promise<Result> {
-  const { supabase, uid, n } = await me();
-  const list = (k: string) => form.getAll(k).map(String).filter(Boolean);
-  const name = String(form.get("name") || "").trim();
-  if (name) await supabase.from("profiles").update({ full_name: name }).eq("id", uid);
-  const exp = parseInt(String(form.get("experience") || ""));
-  const mins = parseInt(String(form.get("session_minutes") || String(n.session_minutes ?? 45)));
-  const { error } = await supabase.from("nutritionists").update({
-    city: String(form.get("city") || "").trim() || null, mode: String(form.get("mode") || "Online"),
-    about: String(form.get("about") || "").trim() || null, qualification: String(form.get("qualification") || "").trim() || null,
-    experience_years: isNaN(exp) ? null : exp, meet_url: String(form.get("meet_url") || "").trim() || null,
-    session_minutes: isNaN(mins) ? 45 : Math.min(120, Math.max(15, mins)),
-    languages: list("languages"), food_types: list("food_types"), goals: list("goals"),
-    ...(n.specialty === "psychology" ? { approaches: list("approaches"), consent_text: String(form.get("consent_text") || "").trim().slice(0, 6000) || null } : {}),
-    published: form.get("published") === "on",
-  }).eq("id", uid);
-  if (error) return { error: error.message };
-  revalidatePath("/pro", "layout");
-  return { ok: true };
-}
-
-export async function addService(_: Result, form: FormData): Promise<Result> {
-  const { supabase, uid, n } = await me();
-  const name = String(form.get("name") || "").trim();
-  const type = String(form.get("type") || "call");
-  const price = parseInt(String(form.get("price") || "").replace(/\D/g, ""));
-  if (!name || isNaN(price)) return { error: "Add a name and a price." };
-  if ((type === "package" || type === "monthly") && !PLANS[n.plan as PlanId].packages) return { error: "Packages and monthly plans need the Growth plan." };
-  if (type === "group" && !PLANS[n.plan as PlanId].groups) return { error: "Group classes need the Pro plan." };
-  const seats = parseInt(String(form.get("capacity") || "10"));
-  const { error } = await supabase.from("services").insert({ nutritionist_id: uid, name, type, price, details: String(form.get("details") || "").trim() || null,
-    capacity: type === "group" ? Math.min(100, Math.max(2, isNaN(seats) ? 10 : seats)) : null });
-  if (error) return { error: error.message };
-  revalidatePath("/pro/business");
-  return { ok: true };
-}
-
-export async function toggleService(id: string, active: boolean) {
+/* ---------- Settings ---------- */
+export async function updateSettings(_: Result, form: FormData): Promise<Result> {
   const { supabase, uid } = await me();
-  await supabase.from("services").update({ active }).eq("id", id).eq("nutritionist_id", uid);
-  revalidatePath("/pro/business");
-}
-
-export async function saveAvailability(windows: { weekday: number; start_time: string; end_time: string }[]): Promise<Result> {
-  const { supabase, uid } = await me();
-  const clean = windows.filter((w) => w.start_time < w.end_time);
-  await supabase.from("availability").delete().eq("nutritionist_id", uid);
-  if (clean.length) {
-    const { error } = await supabase.from("availability").insert(clean.map((w) => ({ ...w, nutritionist_id: uid })));
-    if (error) return { error: error.message };
-  }
-  revalidatePath("/pro/business");
+  const name = text(form, "name", 80);
+  if (!name) return { error: "Enter your name." };
+  const rawMeet = String(form.get("meet_url") || "");
+  const meet = cleanMeetUrl(rawMeet);
+  if (rawMeet.trim() && !meet) return { error: "Paste the full Google Meet link, like https://meet.google.com/abc-defg-hij" };
+  const mins = parseInt(String(form.get("session_minutes") || "45"));
+  const phone = cleanPhone(String(form.get("phone") || ""));
+  const [{ error: e1 }, { error: e2 }] = await Promise.all([
+    supabase.from("profiles").update({ full_name: name, phone: phone || null }).eq("id", uid),
+    supabase.from("nutritionists").update({
+      practice_name: text(form, "practice_name", 80), city: text(form, "city", 60), qualification: text(form, "qualification", 120),
+      meet_url: meet, session_minutes: isNaN(mins) ? 45 : Math.min(120, Math.max(15, mins)),
+      chat_start: String(form.get("chat_start") || "") || null, chat_end: String(form.get("chat_end") || "") || null,
+    }).eq("id", uid),
+  ]);
+  if (e1 || e2) return { error: (e1 || e2)!.message };
   return { ok: true };
-}
-
-export async function setBookingStatus(id: string, status: "completed" | "cancelled") {
-  const { supabase, uid } = await me();
-  await supabase.from("bookings").update({ status }).eq("id", id).eq("nutritionist_id", uid);
-  revalidatePath("/pro", "layout");
-}
-
-/** Test mode only: switch plan without paying. Disabled once Razorpay keys are set. */
-export async function switchPlanTest(plan: PlanId) {
-  const { uid } = await me();
-  if (paymentsLive()) throw new Error("Use the real checkout");
-  await createAdminClient().from("nutritionists").update({ plan, plan_renews_at: new Date(Date.now() + 30 * 864e5).toISOString() }).eq("id", uid);
-  revalidatePath("/pro", "layout");
-}
-
-export async function saveInvoiceSettings(_: Result, form: FormData): Promise<Result> {
-  const { supabase, uid, n } = await me();
-  if (!PLANS[n.plan as PlanId].invoices) return { error: "GST invoices come with the Growth plan." };
-  const gstin = String(form.get("gstin") || "").trim().toUpperCase() || null;
-  if (gstin && !/^[0-9]{2}[A-Z0-9]{13}$/.test(gstin)) return { error: "A GSTIN has 15 characters, starting with 2 digits." };
-  const rate = parseInt(String(form.get("gst_rate") || "0"));
-  const { error } = await supabase.from("nutritionists").update({
-    business_name: String(form.get("business_name") || "").trim() || null, gstin,
-    business_address: String(form.get("business_address") || "").trim() || null,
-    gst_rate: [0, 5, 18].includes(rate) ? rate : 0,
-  }).eq("id", uid);
-  if (error) return { error: error.message };
-  revalidatePath("/pro/business");
-  return { ok: true };
-}
-
-/* ---------- Group sessions (Pro and Clinic) ---------- */
-export async function scheduleGroup(_: Result, form: FormData): Promise<Result> {
-  const { supabase, uid, n } = await me();
-  if (!PLANS[n.plan as PlanId].groups) return { error: "Group sessions need the Pro plan." };
-  const { data: s } = await supabase.from("services").select("*").eq("id", String(form.get("service"))).eq("nutritionist_id", uid).eq("type", "group").single();
-  if (!s) return { error: "Pick a group service. Add one in Business first." };
-  const date = String(form.get("date") || ""), time = String(form.get("time") || "");
-  const mins = Math.min(240, Math.max(15, parseInt(String(form.get("minutes") || "60")) || 60));
-  const seats = Math.min(100, Math.max(2, parseInt(String(form.get("capacity") || s.capacity || 10)) || 10));
-  const starts = new Date(`${date}T${time}:00+05:30`);
-  if (isNaN(starts.getTime())) return { error: "Pick a date and time." };
-  if (starts.getTime() < Date.now()) return { error: "Pick a time in the future." };
-  const ends = new Date(starts.getTime() + mins * 60_000);
-  const { data: clash } = await supabase.rpc("busy_slots", { n: uid, from_ts: starts.toISOString(), to_ts: ends.toISOString() });
-  if (clash?.length) return { error: "You already have a session at that time." };
-  const { error } = await supabase.from("group_sessions").insert({ nutritionist_id: uid, service_id: s.id, title: String(form.get("title") || "").trim() || s.name,
-    starts_at: starts.toISOString(), ends_at: ends.toISOString(), capacity: seats });
-  if (error) return { error: error.message };
-  revalidatePath("/pro/groups");
-  return { ok: true };
-}
-
-export async function cancelGroup(id: string) {
-  const { supabase, uid } = await me();
-  await supabase.from("group_sessions").update({ cancelled: true }).eq("id", id).eq("nutritionist_id", uid);
-  await supabase.from("bookings").update({ status: "cancelled" }).eq("group_session_id", id).eq("nutritionist_id", uid);
-  revalidatePath("/pro/groups");
 }

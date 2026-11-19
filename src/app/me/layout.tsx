@@ -6,10 +6,10 @@ export default function MeLayout({ children }: { children: React.ReactNode }) {
     <Shell>
       <div className="flex flex-1 flex-col">{children}</div>
       <BottomNav items={[
-        { href: "/me", label: "Today", icon: "cam", exact: true },
+        { href: "/me", label: "Today", icon: "home", exact: true },
+        { href: "/me/files", label: "Files", icon: "file" },
         { href: "/me/progress", label: "Progress", icon: "chart" },
         { href: "/me/chat", label: "Chat", icon: "chat" },
-        { href: "/discover", label: "Find", icon: "search" },
         { href: "/me/account", label: "Me", icon: "me" },
       ]} />
     </Shell>

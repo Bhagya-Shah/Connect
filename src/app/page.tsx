@@ -1,34 +1,36 @@
 import Link from "next/link";
-import { Shell } from "@/components/Shell";
-import { GoalBoxes } from "@/components/GoalBoxes";
+import { Logo } from "@/components/Shell";
+
+const FEATURES = [
+  ["Client database", "Every client's goal, weight, notes, files and history in one place. Search in a second."],
+  ["Logins in one tap", "Add a client and send their login on WhatsApp. They log in with their mobile number."],
+  ["Diet plans and reports", "Upload PDF plans, build meal plans, and get blood reports from clients."],
+  ["Google Meet sessions", "Schedule a session and both of you get a Join button and a calendar link."],
+  ["Daily meal photos", "Clients snap each meal. You mark it on plan or off plan and reply."],
+  ["Progress and chat", "Weight charts, weekly check-ins and chat, without mixing it into WhatsApp."],
+];
 
 export default function Home() {
   return (
-    <Shell>
-      <header className="flex items-center justify-between px-4 py-3">
-        <span className="flex items-center gap-2 font-display text-xl font-bold"><span className="h-3 w-3 rounded-full bg-accent shadow-[8px_0_0_var(--saffron)]" />&nbsp;&nbsp;Connect</span>
-        <Link href="/login" className="btn-ghost btn-sm">Log in</Link>
+    <div className="min-h-dvh bg-surface-2">
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+        <Logo />
+        <Link href="/go" className="btn-ghost btn-sm">Open app</Link>
       </header>
-      <main className="flex flex-col gap-4 p-4">
-        <section className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold leading-tight">Find the right expert for your goal</h1>
-          <p className="text-muted">Verified nutritionists and therapists. Book, pay and meet on video, follow your plan, and see your progress in one app.</p>
-        </section>
-        <h2 className="h3">Eat better</h2>
-        <GoalBoxes />
-        <Link href="/discover?type=nutrition" className="btn-ghost">See all nutritionists</Link>
-        <h2 className="h3 mt-2">Feel better</h2>
-        <GoalBoxes field="psychology" />
-        <Link href="/discover?type=psychology" className="btn-ghost">See all therapists</Link>
-        <section className="card mt-2 border-transparent bg-accent-soft">
-          <h2 className="h3">Are you a nutritionist or therapist?</h2>
-          <p className="text-sm">Bookings, payments, video sessions, client progress and notes in one place. Free for up to 5 clients.</p>
+      <main className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-6 md:pt-14">
+        <section className="flex max-w-2xl flex-col gap-4">
+          <h1 className="text-3xl font-semibold leading-tight md:text-5xl">Run your nutrition practice from one app</h1>
+          <p className="text-lg text-muted">Your clients, their diet plans, reports, meal photos and Google Meet sessions. Fast on any phone or laptop.</p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/login?next=%2Fonboarding%3Fas%3Dnutritionist" className="btn btn-sm">I&apos;m a nutritionist</Link>
-            <Link href="/login?next=%2Fonboarding%3Fas%3Dtherapist" className="btn btn-sm">I&apos;m a therapist</Link>
+            <Link href="/login" className="btn">Nutritionist sign in</Link>
+            <Link href="/login?as=client" className="btn-ghost">Client login</Link>
           </div>
+          <Link href="/demo/pro" className="text-sm font-semibold text-accent">Or try the demo, no sign-up →</Link>
+        </section>
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map(([t, d]) => <div key={t} className="card"><h2 className="h3">{t}</h2><p className="text-sm text-muted">{d}</p></div>)}
         </section>
       </main>
-    </Shell>
+    </div>
   );
 }

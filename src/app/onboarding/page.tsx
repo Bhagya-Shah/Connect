@@ -3,11 +3,11 @@ import { getUserAndProfile } from "@/lib/auth";
 import { Shell } from "@/components/Shell";
 import Onboarding from "./Onboarding";
 
-export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ next?: string; as?: string }> }) {
-  const { user, profile } = await getUserAndProfile();
+export default async function OnboardingPage() {
+  const { user, profile, me } = await getUserAndProfile();
   if (!user) redirect("/login");
-  const sp = await searchParams;
-  if (profile?.role === "nutritionist") redirect("/pro");
-  if (profile?.role === "client") redirect(sp.next || "/me");
-  return <Shell><Onboarding next={sp.next} initial={sp.as === "nutritionist" ? "nutritionist" : sp.as === "therapist" ? "psychology" : undefined} /></Shell>;
+  if (profile?.role === "nutritionist" && me) redirect("/pro");
+  if (profile?.role === "client") redirect("/me");
+  const meta = user.user_metadata as { full_name?: string; name?: string };
+  return <Shell><Onboarding name={profile?.full_name || meta.full_name || meta.name || ""} email={user.email ?? ""} /></Shell>;
 }
